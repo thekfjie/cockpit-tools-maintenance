@@ -56,7 +56,7 @@ try {
         throw 'Common Controls v6 manifest was not embedded'
     }
 
-    $filters = @('account_project_switch', 'local_projects',
+    $filters = @('account_project_switch', 'local_projects', 'history_projection_repair',
         'provider_gateway_port_probe', 'occupied_persisted_gateway_port_is_released_before_start')
     foreach ($filter in $filters) {
         $listed = & $testExe $filter --list
