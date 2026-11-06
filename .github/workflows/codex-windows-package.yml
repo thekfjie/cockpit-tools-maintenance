@@ -1,0 +1,21 @@
+name: Prepare upstream PR sources
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  format:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          components: rustfmt
+      - name: Format new Rust sources
+        run: python scripts/format-upstream-pr-sources.py
+      - uses: actions/upload-artifact@v6
+        with:
+          name: pr-formatting
+          path: pr-formatting.patch
+          if-no-files-found: error
+          retention-days: 1
