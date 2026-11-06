@@ -15,7 +15,7 @@ for relative, marker in [
     text = path.read_text(encoding="utf-8")
     position = text.index(marker)
     result = subprocess.run(["rustfmt", "--edition", "2021", "--config", "skip_children=true", "--emit", "stdout"], input=text[position:], text=True, encoding="utf-8", capture_output=True, check=True)
-    path.write_text(text[:position].rstrip() + "\\n\\n" + result.stdout)
+    path.write_text(text[:position].rstrip() + "\n\n" + result.stdout, encoding="utf-8", newline="\n")
 patch = subprocess.run(["git", "diff", "--", "src-tauri/src"], capture_output=True, check=True).stdout
 Path("pr-formatting.patch").write_bytes(patch)
 print("Formatting patch bytes:", len(patch))
