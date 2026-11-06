@@ -56,7 +56,14 @@ try {
         throw 'Common Controls v6 manifest was not embedded'
     }
 
-    foreach ($filter in @('account_project_switch', 'codex_local_project_recovery')) {
+    $filters = @('account_project_switch', 'local_projects',
+        'provider_gateway_port_probe', 'occupied_persisted_gateway_port_is_released_before_start')
+    foreach ($filter in $filters) {
+        $listed = & $testExe $filter --list
+        if ($LASTEXITCODE -ne 0) { throw "Listing Rust regressions failed: $filter" }
+        if (@($listed | Where-Object { $_ -match ': test$' }).Count -eq 0) {
+            throw "No Rust regressions matched filter: $filter"
+        }
         & $testExe $filter --test-threads=1 --nocapture 2>&1 |
             Tee-Object -FilePath "$filter-tests.log"
         if ($LASTEXITCODE -ne 0) { throw "Rust regressions failed: $filter ($LASTEXITCODE)" }
