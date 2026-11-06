@@ -25,6 +25,8 @@ jobs:
         with:
           workspaces: ". -> target"
           shared-key: maintenance-windows-release-v1
+          cache-on-failure: true
+          cache-workspace-crates: true
       - name: Install frontend dependencies
         run: npm ci --prefer-offline --no-audit --no-fund
       - name: Frontend and release regressions
@@ -37,11 +39,8 @@ jobs:
       - name: Production frontend and type check
         run: npm run build
       - name: Account and project compatibility regressions
-        shell: bash
-        run: |
-          set -euo pipefail
-          cargo test -p cockpit-tools --lib --release --locked --features tauri/custom-protocol account_project_switch -- --test-threads=1 2>&1 | tee project-switch-tests.log
-          cargo test -p cockpit-tools --lib --release --locked --features tauri/custom-protocol codex_local_project_recovery -- --test-threads=1 2>&1 | tee project-recovery-tests.log
+        shell: pwsh
+        run: ./scripts/test-windows-rust.ps1
       - name: Build Windows installer with embedded frontend
         shell: bash
         run: |
