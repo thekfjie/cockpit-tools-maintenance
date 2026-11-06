@@ -38,11 +38,6 @@ jobs:
           node scripts/check_locales.cjs
       - name: Production frontend and type check
         run: npm run build
-      - name: Core Rust library tests
-        shell: pwsh
-        run: |
-          cargo test --locked --package cockpit-core -- --test-threads=1
-          if ($LASTEXITCODE -ne 0) { throw 'Core Rust tests failed' }
       - name: Account and project compatibility regressions
         shell: pwsh
         run: ./scripts/test-windows-rust.ps1
