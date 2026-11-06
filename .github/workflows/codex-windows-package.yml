@@ -1,21 +1,58 @@
-name: Prepare upstream PR sources
+name: Windows upstream PR validation
+run-name: Windows upstream PR validation · ${{ github.ref_name }}
 on:
   workflow_dispatch:
 permissions:
   contents: read
+concurrency:
+  group: maintenance-windows-${{ github.ref }}
+  cancel-in-progress: true
 jobs:
-  format:
+  windows:
     runs-on: windows-latest
+    timeout-minutes: 90
+    env:
+      CARGO_TERM_COLOR: always
+      CARGO_PROFILE_RELEASE_DEBUG: "0"
     steps:
       - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
       - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
         with:
-          components: rustfmt
-      - name: Format new Rust sources
-        run: python scripts/format-upstream-pr-sources.py
-      - uses: actions/upload-artifact@v6
+          workspaces: ". -> target"
+          shared-key: maintenance-windows-release-v1
+          cache-on-failure: true
+          cache-workspace-crates: true
+      - name: Install frontend dependencies
+        run: npm ci --prefer-offline --no-audit --no-fund
+      - name: Frontend and release regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          npm test 2>&1 | tee frontend-tests.log
+          npm run test:release 2>&1 | tee release-tests.log
+          node scripts/check_locales.cjs
+      - name: Production frontend and type check
+        run: npm run build
+      - name: Core Rust library tests
+        shell: pwsh
+        run: |
+          cargo test --locked --package cockpit-core -- --test-threads=1
+          if ($LASTEXITCODE -ne 0) { throw 'Core Rust tests failed' }
+      - name: Account and project compatibility regressions
+        shell: pwsh
+        run: ./scripts/test-windows-rust.ps1
+      - name: Upload validation logs
+        if: always()
+        uses: actions/upload-artifact@v6
         with:
-          name: pr-formatting
-          path: pr-formatting.patch
-          if-no-files-found: error
-          retention-days: 1
+          name: windows-maintenance-logs-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            *-tests.log
+            windows-build.log
