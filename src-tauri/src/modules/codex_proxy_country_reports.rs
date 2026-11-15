@@ -57,6 +57,19 @@ fn record_check(app: Option<&tauri::AppHandle>, result: &CountryCheck, home: &Pa
     }
     if let Some(app) = app { let _ = app.emit("codex:country-check", result); }
 }
+struct CountryCheckGuard {
+    app: Option<tauri::AppHandle>, result: CountryCheck, home: PathBuf,
+    signature: String, started: std::time::Instant, completed: bool,
+}
+impl Drop for CountryCheckGuard {
+    fn drop(&mut self) {
+        if self.completed { return; }
+        self.result.status = "blocked".into();
+        self.result.reason = Some(UNKNOWN.into());
+        self.result.elapsed_ms = self.started.elapsed().as_millis().min(u64::MAX as u128) as u64;
+        record_check(self.app.as_ref(), &self.result, &self.home, &self.signature);
+    }
+}
 pub fn recent_checks(account: &str) -> Result<Vec<CountryCheck>, String> {
     let key = policy_key(account)?;
     let items = CHECKS.lock().map_err(|_| STORAGE)?.get(&key).cloned().unwrap_or_default();
@@ -80,6 +93,8 @@ async fn run_check(app: Option<&tauri::AppHandle>, bound: Option<&str>, home: &P
         expected_country: expected.clone(), actual_country: None, status: "checking".into(),
         checked_at: chrono::Utc::now().timestamp_millis(), elapsed_ms: 0, source: "unknown".into(), reason: None, stale: false };
     record_check(app, &result, home, &signature);
+    let mut guard = CountryCheckGuard { app: app.cloned(), result: result.clone(), home: home.into(),
+        signature: signature.clone(), started, completed: false };
     let checked = async {
         let resolved;
         let proxy = match prepared_proxy {
@@ -88,6 +103,7 @@ async fn run_check(app: Option<&tauri::AppHandle>, bound: Option<&str>, home: &P
         };
         let (route, bypass, source) = route_for_check(&account, home, proxy)?;
         result.source = source.into();
+        guard.result = result.clone();
         let client = probe_client(route.as_deref(), bypass.as_deref())?;
         let actual = tokio::time::timeout(Duration::from_secs(15), query_country(&client, ENDPOINT)).await.map_err(|_| UNKNOWN)??;
         result.actual_country = Some(actual.clone());
@@ -104,6 +120,7 @@ async fn run_check(app: Option<&tauri::AppHandle>, bound: Option<&str>, home: &P
             error.clone()
         } else { "PROXY_COUNTRY_ROUTE_UNKNOWN".into() }
     });
+    guard.completed = true;
     record_check(app, &result, home, &signature);
     checked.map(|_| Some(result))
 }

@@ -124,6 +124,14 @@ fn country_check_history_is_account_scoped_bounded_and_invalidated_by_network_ch
     assert!(recent_checks("different-account").unwrap().is_empty());
     std::fs::write(home.join(".env"), "HTTPS_PROXY=http://changed.invalid:7890\n").unwrap();
     assert!(recent_checks(&account).unwrap().last().unwrap().stale);
+    // Dropping a timed-out/cancelled probe records a closed failure state.
+    {
+        let mut result = items.last().unwrap().clone();
+        result.check_id = "cancelled-check".into(); result.status = "checking".into();
+        let _cancelled = CountryCheckGuard { app: None, result, home: home.clone(), signature: signature.clone(),
+            started: std::time::Instant::now(), completed: false };
+    }
+    assert_eq!(recent_checks(&account).unwrap().last().unwrap().status, "blocked");
     invalidate_report(&account);
     assert!(recent_checks(&account).unwrap().is_empty());
 }
