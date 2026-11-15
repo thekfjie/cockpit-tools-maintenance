@@ -154,6 +154,10 @@ export function CodexInstanceLaunchProgressModal() {
     let unlistenSwitch: (() => void) | undefined;
     const applyPayload = (payload: LaunchProgressPayload) => {
       if (disposed || !payload.instanceId) return;
+      if (payload.type === "error" && codexCountryErrorKey(payload.error)) {
+        payload = { ...payload, step: "checkProxyCountry", stepStatus: "error",
+          details: { ...payload.details, error: payload.error } };
+      }
       const prerequisiteKey = payload.type === "error" ? proxyEnginePrerequisiteKey(payload.error) : null;
       if (prerequisiteKey) {
         presentProxyEnginePrerequisite(payload.error);

@@ -1,6 +1,6 @@
 import { useCodexCountryProgress } from './useCodexCountryProgress';
 import { countryProgressLines } from '../utils/codexCountryProgress';
-import { codexCountryErrorValues } from '../utils/codexProxyCountry';
+import { codexCountryErrorKey, codexCountryErrorValues } from '../utils/codexProxyCountry';
 import { resolveCodexAccountDisplayName } from "../utils/codexAccountDisplayName";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -155,7 +155,7 @@ export function CodexSwitchProgressModal() {
               : detail.authFailure;
           const isAuthRequired = authFailure != null;
           const steps = base.steps.map((step) => ({ ...step }));
-          const countryFailed = steps.some(step => step.id === "checkProxyCountry" && step.status === "error");
+          const countryFailed = Boolean(codexCountryErrorKey(detail.error)) || steps.some(step => step.id === "checkProxyCountry" && step.status === "error");
           if (countryFailed) for (const step of steps) {
             if (step.id !== "checkProxyCountry" && step.status === "running") step.status = "pending";
           }

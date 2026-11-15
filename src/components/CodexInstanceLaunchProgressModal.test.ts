@@ -4,7 +4,7 @@ import { readFileSync } from 'node:fs';
 import vm from 'node:vm';
 import ts from 'typescript';
 import { codexLaunchExcludedPids, isCodexLaunchUnconfirmed } from '../utils/codexLaunchConfirmation.ts';
-import { codexCountryErrorValues } from '../utils/codexProxyCountry';
+import { codexCountryErrorKey, codexCountryErrorValues } from '../utils/codexProxyCountry';
 import { codexLaunchErrorKey } from '../utils/codexLaunchProgress.ts';
 
 // Execute the production event reducer without opening an application or dialog.
@@ -27,7 +27,7 @@ function harness() {
     setState(update: (previous: unknown) => unknown) { state = update(state); },
     setActionError(value: unknown) { actionError = value; }, setRetryBusy() {},
     proxyEnginePrerequisiteKey: () => null, presentProxyEnginePrerequisite() {},
-    codexCountryErrorValues, codexLaunchErrorKey, codexLaunchExcludedPids, isCodexLaunchUnconfirmed,
+    codexCountryErrorKey, codexCountryErrorValues, codexLaunchErrorKey, codexLaunchExcludedPids, isCodexLaunchUnconfirmed,
     parseCodexSwitchAuthFailure: () => null, t: (key: string) => key,
   };
   vm.runInNewContext(compiled, context);
@@ -78,5 +78,13 @@ test('a blocked country check does not label client startup or credentials as fa
   h.send({ type: 'error', error: 'PROXY_COUNTRY_MISMATCH:JP:SG' });
   assert.equal(h.state().steps.find((step: any) => step.id === 'checkProxyCountry').status, 'error');
   assert.equal(h.state().steps.find((step: any) => step.id === 'checkInstance').status, 'pending');
+  assert.equal(h.state().steps.find((step: any) => step.id === 'startClient').status, 'pending');
+});
+
+test('country error codes select their own step even if a live evidence event was missed', () => {
+  const h = harness(); h.send({ type: 'start', accountId: 'a' });
+  h.send({ step: 'startClient', stepStatus: 'running' });
+  h.send({ type: 'error', error: 'PROXY_COUNTRY_UNAVAILABLE' });
+  assert.equal(h.state().steps.find((step: any) => step.id === 'checkProxyCountry').status, 'error');
   assert.equal(h.state().steps.find((step: any) => step.id === 'startClient').status, 'pending');
 });

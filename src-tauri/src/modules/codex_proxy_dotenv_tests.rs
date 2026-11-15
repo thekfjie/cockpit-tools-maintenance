@@ -104,6 +104,8 @@ fn editable_client_proxy_values_restore_originals_and_do_not_cross_accounts() {
     let (mut a, projected) = transition_with_env(State::default(), original.clone(), "a",
         &CodexLaunchProxy::ClientDefaults, Some("HTTPS_PROXY=http://account-a.invalid:8080\n")).unwrap();
     a.pending = None;
+    assert!(projected.as_deref().unwrap().contains("HTTPS_PROXY='http://account-a.invalid:8080'"));
+    assert!(projected.as_deref().unwrap().contains("https_proxy='http://account-a.invalid:8080'"));
     let variables = parse_proxy_variables(projected.as_deref().unwrap()).unwrap();
     assert_eq!(variables["https_proxy"], "http://account-a.invalid:8080");
     assert!(projected.as_deref().unwrap().contains("KEEP=untouched"));

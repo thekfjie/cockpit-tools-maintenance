@@ -148,7 +148,8 @@ fn transition_with_env(mut state: State, current: Option<String>, account: &str,
     let manual = matches!(proxy, CodexLaunchProxy::ClientDefaults) && saved.is_some();
     let pairs: Vec<(String, String)> = if manual {
         super::codex_proxy_env::normalize_document(saved.unwrap_or_default())?;
-        parse_proxy_variables(saved.unwrap_or_default())?.into_iter().map(|(name, value)| (name.to_ascii_uppercase(), value)).collect()
+        parse_proxy_variables(saved.unwrap_or_default())?.into_iter().flat_map(|(name, value)|
+            [(name.to_ascii_uppercase(), value.clone()), (name, value)]).collect()
     } else { proxy.dotenv_overrides()?.into_iter().map(|(name, value)| (name.to_owned(), value)).collect() };
     let projected_original = if manual { merge_defaults(original.as_deref(), Some(""))? } else { original.clone() };
     let after = if pairs.is_empty() && !manual {

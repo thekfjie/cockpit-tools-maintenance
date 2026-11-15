@@ -1,14 +1,16 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import type { CodexLaunchStepStatus } from './codexLaunchProgress';
 import { applyCountryProgress } from './codexCountryProgress';
 import type { CodexCountryCheck } from '../services/codexProxyCountryService';
 
 const report: CodexCountryCheck = { checkId: 'fixture', accountId: 'a', scope: 'launch',
   expectedCountry: 'JP', actualCountry: null, status: 'checking', checkedAt: 1,
   elapsedMs: 0, source: 'account', reason: null, stale: false };
-const initial = () => ({ accountId: '__provider_gateway__:a', status: 'running', steps: [
-  { id: 'checkProxyCountry', status: 'skipped' as const, details: {} },
-  { id: 'startClient', status: 'pending' as const, details: {} },
+const initial = (): { accountId: string; status: string;
+  steps: { id: string; status: CodexLaunchStepStatus; details: Record<string, unknown> }[] } => ({ accountId: '__provider_gateway__:a', status: 'running', steps: [
+  { id: 'checkProxyCountry', status: 'skipped' as const, details: {} as Record<string, unknown> },
+  { id: 'startClient', status: 'pending' as const, details: {} as Record<string, unknown> },
 ] });
 test('country checks have their own step and leave client startup pending on failure', () => {
   const checking = applyCountryProgress(initial(), report)!;
