@@ -44,7 +44,7 @@ export function CodexProxyConnectionSummary({ account, status, failed, onSwitch,
       </div>
       {account.egress_proxy_disabled && <p>{t('codex.proxy.disabledHint')}</p>}
       {!account.egress_proxy_disabled && !account.egress_proxy_client_defaults && binding.source === 'unified' && <p>{t('codex.proxy.modeUnifiedHint')}</p>}
-      {!account.egress_proxy_disabled && binding.source === 'none' && <p>{t('codex.proxy.managementHint')}</p>}
+      {!account.egress_proxy_disabled && !account.egress_proxy_client_defaults && binding.source === 'none' && <p>{t('codex.proxy.managementHint')}</p>}
     </div>
     <div className="codex-proxy-preview-current">
       <div className="codex-proxy-preview-current-content">

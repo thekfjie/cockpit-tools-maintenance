@@ -215,9 +215,13 @@ fn remove_secret_backup(path: &Path) -> Result<(), String> {
 }
 
 fn write_secret_string_atomic_internal(path: &Path, content: &str) -> Result<(), String> {
+    remove_secret_backup(path)?;
+    write_private_string_preserving_backups_internal(path, content)
+}
+
+fn write_private_string_preserving_backups_internal(path: &Path, content: &str) -> Result<(), String> {
     let parent = path.parent().ok_or("无法定位目标目录")?;
     fs::create_dir_all(parent).map_err(|e| format_io_error("创建目录", parent, &e))?;
-    remove_secret_backup(path)?;
     let temp_path = build_temp_file_path(parent, path, "secret-atomic");
     if let Err(err) = write_secret_temp_file(&temp_path, content) {
         let _ = fs::remove_file(&temp_path);
@@ -327,9 +331,19 @@ where
 /// Compare exact bytes under the shared path lock; absence is a real expected state.
 /// Used by recoverable multi-file transactions so rollback cannot replace newer edits.
 pub(crate) fn replace_secret_string_if_matches(
-    path: &Path,
-    expected: Option<&str>,
-    replacement: Option<&str>,
+    path: &Path, expected: Option<&str>, replacement: Option<&str>,
+) -> Result<bool, String> {
+    replace_private_string_if_matches(path, expected, replacement, true)
+}
+
+pub(crate) fn replace_private_string_preserving_backups_if_matches(
+    path: &Path, expected: Option<&str>, replacement: Option<&str>,
+) -> Result<bool, String> {
+    replace_private_string_if_matches(path, expected, replacement, false)
+}
+
+fn replace_private_string_if_matches(
+    path: &Path, expected: Option<&str>, replacement: Option<&str>, cleanup_backup: bool,
 ) -> Result<bool, String> {
     let lock = path_write_lock(path)?;
     let _guard = lock.lock().map_err(|_| "文件写入锁已损坏".to_string())?;
@@ -340,7 +354,8 @@ pub(crate) fn replace_secret_string_if_matches(
     };
     if current.as_deref() != expected { return Ok(false); }
     match replacement {
-        Some(content) => write_secret_string_atomic_internal(path, content)?,
+        Some(content) if cleanup_backup => write_secret_string_atomic_internal(path, content)?,
+        Some(content) => write_private_string_preserving_backups_internal(path, content)?,
         None => match fs::remove_file(path) {
             Ok(()) => {},
             Err(error) if error.kind() == std::io::ErrorKind::NotFound => {},

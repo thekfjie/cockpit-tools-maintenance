@@ -80,9 +80,10 @@ fn recoverable_dotenv_journal_completes_both_crash_windows_and_retains_conflicts
     let path = state_path(&home).unwrap();
     let (pending, after) = transition(State::default(), None, "a", &route(41001)).unwrap();
     write_state(&path, &pending).unwrap();
+    fs::write(home.join(".env.bak"), "user-owned backup").unwrap();
     apply_inner(&home, "a", &route(41001)).unwrap();
     assert_eq!(read_document(&home.join(".env")).unwrap(), after);
-    assert!(!home.join(".env.bak").exists());
+    assert_eq!(fs::read_to_string(home.join(".env.bak")).unwrap(), "user-owned backup");
     write_state(&path, &pending).unwrap();
     apply_inner(&home, "b", &CodexLaunchProxy::ClientDefaults).unwrap();
     assert!(!home.join(".env").exists());

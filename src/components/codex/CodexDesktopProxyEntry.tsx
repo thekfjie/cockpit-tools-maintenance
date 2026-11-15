@@ -37,7 +37,7 @@ export function CodexDesktopLaunchNotice() {
     const read = () => { void invoke<string | null>('codex_desktop_launch_failure').then(value => {
       if (alive) setError(value ?? '');
     }).catch(() => {}); };
-    const subscribed = listen('codex:desktop-launch-blocked', read);
+    const subscribed = listen('codex:desktop-launch-blocked', read).catch(() => () => {});
     read();
     return () => { alive = false; void subscribed.then(unlisten => unlisten()); };
   }, []);

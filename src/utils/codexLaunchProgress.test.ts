@@ -83,3 +83,11 @@ test('preserves id_token details and normalizes refresh progress into the shared
 test('rejects switch events without a target account', () => {
   assert.equal(mapCodexSwitchProgressToLaunch({ step: 'accessToken' }), null);
 });
+
+test('account proxy startup checks are retryable setup failures', () => {
+  assert.equal(codexLaunchErrorKey('PROXY_LAUNCH_CHECK_FAILED'), 'codex.proxy.desktop.checkFailed');
+  assert.equal(codexLaunchErrorKey('PROXY_ENV_CHANGED'), 'codex.proxy.desktop.envChanged');
+  assert.equal(codexLaunchErrorKey('PROXY_ENV_STORAGE'), 'codex.proxy.desktop.envStorage');
+  assert.equal(codexLaunchErrorKey('PROXY_ENV_UNSUPPORTED'), 'codex.proxy.desktop.envUnsupported');
+  assert.equal(codexLaunchErrorKey('PROXY_LAUNCH_STOP_FAILED'), 'codex.proxy.desktop.stopFailed');
+});

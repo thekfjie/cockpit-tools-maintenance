@@ -8,6 +8,7 @@ use tauri::{Emitter, Manager};
 const ARG: &str = "--codex-desktop-launch";
 const ERROR: &str = "PROXY_SHORTCUT_STORAGE";
 static ACTIVE: AtomicBool = AtomicBool::new(false);
+static ENTRY_REQUESTED: AtomicBool = AtomicBool::new(false);
 static FAILURE: Mutex<Option<String>> = Mutex::new(None);
 
 fn launch_requested(args: &[String]) -> bool { args.len() == 2 && args[1] == ARG }
@@ -17,10 +18,12 @@ impl Drop for LaunchLease { fn drop(&mut self) { ACTIVE.store(false, Ordering::R
 async fn launch_last(app: tauri::AppHandle) -> Result<(), String> {
     if ACTIVE.compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire).is_err() { return Err("PROXY_LAUNCH_BUSY".into()); }
     let _lease = LaunchLease;
+    let initial = super::codex_instance::resolve_codex_instance_start_target(super::codex_instance::DEFAULT_INSTANCE_ID)?;
+    let profile_lease = modules::codex_account::try_acquire_profile_mutation_lease(&initial.user_data_dir, "desktop-entry")?;
+    let target = super::codex_instance::resolve_codex_instance_start_target(super::codex_instance::DEFAULT_INSTANCE_ID)?;
+    if target.user_data_dir != initial.user_data_dir { return Err("PROXY_ENV_CHANGED".into()); }
     let settings = modules::codex_instance::load_default_settings()?;
     if settings.launch_mode == crate::models::InstanceLaunchMode::Cli { return Err("PROXY_DESKTOP_CLI".into()); }
-    let target = super::codex_instance::resolve_codex_instance_start_target(super::codex_instance::DEFAULT_INSTANCE_ID)?;
-    let profile_lease = modules::codex_account::try_acquire_profile_mutation_lease(&target.user_data_dir, "desktop-entry")?;
     let proxy = modules::codex_instance::resolve_egress_proxy_for_bind_account(target.bind_account_id.as_deref()).await?;
     if let Err(error) = modules::codex_proxy_launch_guard::preflight(&proxy).await {
         // Only the selected default instance is eligible for stopping.
@@ -63,6 +66,7 @@ pub fn dismiss_codex_desktop_launch_failure() { if let Ok(mut failure) = FAILURE
 
 pub fn handle(app: &tauri::AppHandle, args: &[String]) -> bool {
     if !cfg!(windows) || !launch_requested(args) { return false; }
+    if ENTRY_REQUESTED.compare_exchange(false, true, Ordering::AcqRel, Ordering::Acquire).is_err() { return true; }
     if let Some(main) = app.get_webview_window("main") { let _ = main.hide(); }
     let app = app.clone();
     tauri::async_runtime::spawn(async move {
@@ -74,6 +78,7 @@ pub fn handle(app: &tauri::AppHandle, args: &[String]) -> bool {
                 let _ = app.emit("codex:desktop-launch-blocked", ());
             }
         }
+        ENTRY_REQUESTED.store(false, Ordering::Release);
     });
     true
 }
@@ -124,14 +129,26 @@ $link.Description='Codex'
 $link.IconLocation='{},0'
 {}
 $link.Save()
+$verified=$shell.CreateShortcut({})
+if ($verified.TargetPath -ne {} -or $verified.Arguments -ne '{}') {{ throw 'Shortcut verification failed' }}
 "#, quoted(staging), quoted(exe), ARG, exe.to_string_lossy().replace('\'', "''"),
-        original.map(|path| format!("$previous=$shell.CreateShortcut({}); if ($previous.IconLocation) {{ $link.IconLocation=$previous.IconLocation }}", quoted(path))).unwrap_or_default());
+        original.map(|path| format!("$previous=$shell.CreateShortcut({}); if ($previous.IconLocation) {{ $link.IconLocation=$previous.IconLocation }}", quoted(path))).unwrap_or_default(), quoted(staging), quoted(exe), ARG);
     let encoded = base64::engine::general_purpose::STANDARD.encode(script.encode_utf16().flat_map(u16::to_le_bytes).collect::<Vec<_>>());
-    let status = Command::new("powershell.exe")
+    let mut child = Command::new("powershell.exe")
         .args(["-NoLogo", "-NoProfile", "-NonInteractive", "-EncodedCommand", &encoded])
         .creation_flags(0x08000000).stdin(Stdio::null()).stdout(Stdio::null()).stderr(Stdio::null())
-        .status().map_err(|_| ERROR)?;
-    if !status.success() { return Err(ERROR.into()); }
+        .spawn().map_err(|_| ERROR)?;
+    let started = std::time::Instant::now();
+    loop {
+        if let Some(status) = child.try_wait().map_err(|_| ERROR)? {
+            if !status.success() { return Err(ERROR.into()); }
+            break;
+        }
+        if started.elapsed() > std::time::Duration::from_secs(15) {
+            let _ = child.kill(); let _ = child.wait(); return Err(ERROR.into());
+        }
+        std::thread::sleep(std::time::Duration::from_millis(50));
+    }
     read_link(staging)?.ok_or_else(|| ERROR.into())
 }
 
@@ -200,7 +217,7 @@ mod tests {
     #[cfg(windows)]
     #[test]
     fn shortcut_generation_is_isolated_and_preserves_spaces_in_paths() {
-        let root = std::env::temp_dir().join(format!("codex-entry-fixture-{}", uuid::Uuid::new_v4()));
+        let root = std::env::temp_dir().join(format!("codex entry fixture {}", uuid::Uuid::new_v4()));
         std::fs::create_dir_all(&root).unwrap();
         let file = root.join("fixture.lnk");
         let bytes = build_shortcut(&file, &std::env::current_exe().unwrap(), None).unwrap();

@@ -101,8 +101,9 @@ fn merge_defaults(current: Option<&str>, saved: Option<&str>) -> Result<Option<S
 
 fn unproject(current: Option<&str>, active: &Owned) -> Result<Option<String>, String> {
     let current = current.ok_or(CONFLICT)?;
-    if current.matches(&active.block).count() != 1 { return Err(CONFLICT.into()); }
-    let text = current.replacen(&active.block, "", 1);
+    if current.matches(active.block.as_str()).count() != 1 { return Err(CONFLICT.into()); }
+    let text = current.replacen(active.block.as_str(), "", 1);
+    if text.contains(BEGIN) || text.contains(END) { return Err(CONFLICT.into()); }
     // Preserve absent versus empty, plus edits to unrelated settings made while managed.
     Ok(if text.is_empty() && active.original.is_none() { None } else { Some(text) })
 }
@@ -191,7 +192,7 @@ fn apply_inner(home: &Path, account: &str, proxy: &CodexLaunchProxy) -> Result<(
     let mut state = read_state(&path)?;
     if let Some(pending) = state.pending.as_ref() {
         if current == pending.before {
-            if !atomic_write::replace_secret_string_if_matches(&env, current.as_deref(), pending.after.as_deref()).map_err(|_| ERROR)? {
+            if !atomic_write::replace_private_string_preserving_backups_if_matches(&env, current.as_deref(), pending.after.as_deref()).map_err(|_| ERROR)? {
                 return Err(CONFLICT.into());
             }
             current = pending.after.clone();
@@ -206,7 +207,7 @@ fn apply_inner(home: &Path, account: &str, proxy: &CodexLaunchProxy) -> Result<(
     let (mut next, after) = transition(state, current.clone(), account, proxy)?;
     // Write-ahead journal makes a crash between .env and state writes recoverable.
     write_state(&path, &next)?;
-    if !atomic_write::replace_secret_string_if_matches(&env, current.as_deref(), after.as_deref()).map_err(|_| ERROR)? {
+    if !atomic_write::replace_private_string_preserving_backups_if_matches(&env, current.as_deref(), after.as_deref()).map_err(|_| ERROR)? {
         return Err(CONFLICT.into());
     }
     next.pending = None;

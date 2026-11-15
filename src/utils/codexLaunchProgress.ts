@@ -19,6 +19,14 @@ export function codexLaunchErrorKey(error: unknown): string | null {
   if (code === 'PROXY_ENTRY_PORT_UNAVAILABLE' || code === 'PROXY_RUNTIME_NOT_READY') {
     return 'codex.launchErrors.proxyEntryFailed';
   }
+  const launchProxyErrors: Record<string, string> = {
+    PROXY_LAUNCH_CHECK_FAILED: 'codex.proxy.desktop.checkFailed',
+    PROXY_ENV_CHANGED: 'codex.proxy.desktop.envChanged',
+    PROXY_ENV_STORAGE: 'codex.proxy.desktop.envStorage',
+    PROXY_ENV_UNSUPPORTED: 'codex.proxy.desktop.envUnsupported',
+    PROXY_LAUNCH_STOP_FAILED: 'codex.proxy.desktop.stopFailed',
+  };
+  if (Object.prototype.hasOwnProperty.call(launchProxyErrors, code)) return launchProxyErrors[code];
   const clientProxyErrors: Record<string, string> = {
     CLIENT_PROXY_STORAGE: 'runtimeReadFailed',
     CLIENT_PROXY_INVALID_MODE: 'saveFailed',

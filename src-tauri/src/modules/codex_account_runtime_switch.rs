@@ -876,11 +876,6 @@ async fn commit_account_switch_locked(
     account_id: &str,
     prepared: PreparedCodexAccountSwitch,
 ) -> Result<CodexAccount, String> {
-    #[cfg(windows)]
-    {
-        let proxy = crate::modules::codex_instance::resolve_egress_proxy_for_bind_account(Some(account_id)).await?;
-        crate::modules::codex_proxy_dotenv::apply(&get_codex_home(), account_id, &proxy)?;
-    }
     match prepared {
         PreparedCodexAccountSwitch::Account(account) => {
             let updated_account = switch_account_with_prepared(account_id, account)?;

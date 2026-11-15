@@ -5871,7 +5871,9 @@
         "restartRequired": "The running Codex instance was not using the complete account proxy configuration and has been stopped. Confirm by launching again.",
         "shortcutChanged": "The shortcut was changed by another operation. It was preserved; review the desktop shortcut first.",
         "stopFailed": "Could not stop the Codex instance with mismatched settings. Exit it before retrying.",
-        "setupFailed": "Desktop integration could not be configured. The original shortcut was preserved; try again."
+        "setupFailed": "Desktop integration could not be configured. The original shortcut was preserved; try again.",
+        "envStorage": "Could not safely read or save the proxy configuration. The original file was preserved; check directory permissions and retry.",
+        "envUnsupported": "The .env format could not be safely managed and was not overwritten. Check unclosed quotes or line continuations."
       }
     },
     "more": {
