@@ -130,13 +130,13 @@ pub(crate) struct CodexInstanceStartTarget {
 }
 
 impl CodexInstanceStartTarget {
-    pub(crate) async fn preflight_desktop_proxy(&self) -> Result<(), String> {
+    pub(crate) async fn preflight_desktop_proxy(&self, app: &AppHandle) -> Result<(), String> {
         if launch_mode_uses_desktop_runtime(&self.launch_mode) {
             modules::codex_instance::preflight_egress_proxy_for_bind_account(
                 self.bind_account_id.as_deref(),
             ).await?;
-            modules::codex_proxy_launch_guard::check_for_launch(
-                self.bind_account_id.as_deref(), &self.user_data_dir,
+            modules::codex_proxy_launch_guard::check_launch(
+                app, self.bind_account_id.as_deref(), &self.user_data_dir, None,
             ).await?;
         }
         Ok(())
@@ -165,6 +165,7 @@ fn emit_codex_instance_launch_progress(
         "isDefault".to_string(),
         serde_json::json!(target.is_default),
     );
+    payload.entry("accountId".to_string()).or_insert_with(|| serde_json::json!(target.bind_account_id));
     if let Some(operation) = target.launch_operation.as_deref() {
         payload.insert("operation".to_string(), serde_json::json!(operation));
     }
@@ -2672,7 +2673,7 @@ async fn codex_start_instance_internal(
     );
     // Validate the effective route before credentials, profile writes, or stopping
     // the previous client. Metadata/status lookup alone cannot detect a damaged engine.
-    launch_target.preflight_desktop_proxy().await?;
+    launch_target.preflight_desktop_proxy(&app).await?;
     ensure_codex_instance_start_not_cancelled(&instance_id)?;
     let start_flow_lock =
         CODEX_INSTANCE_START_FLOW_LOCK.get_or_init(|| tokio::sync::Mutex::new(()));
@@ -3105,7 +3106,7 @@ async fn codex_start_instance_internal(
             default_bind_account_id.as_deref(),
         ).await?;
         modules::codex_proxy_dotenv::apply(&default_dir, default_bind_account_id.as_deref().unwrap_or("__client__"), &launch_proxy)?;
-        modules::codex_proxy_launch_guard::check_for_launch(default_bind_account_id.as_deref(), &default_dir).await?;
+        modules::codex_proxy_launch_guard::check_launch(&app, default_bind_account_id.as_deref(), &default_dir, Some(&launch_proxy)).await?;
         modules::codex_proxy_launch_guard::verify_profile(&default_dir, default_bind_account_id.as_deref().unwrap_or("__client__"), &launch_proxy)?;
         launch_proxy.append_electron_args(&mut injection_plan.args);
         emit_codex_instance_launch_step(
@@ -3424,7 +3425,7 @@ async fn codex_start_instance_internal(
         instance.bind_account_id.as_deref(),
     ).await?;
     modules::codex_proxy_dotenv::apply(instance_dir, instance.bind_account_id.as_deref().unwrap_or("__client__"), &launch_proxy)?;
-    modules::codex_proxy_launch_guard::check_for_launch(instance.bind_account_id.as_deref(), instance_dir).await?;
+    modules::codex_proxy_launch_guard::check_launch(&app, instance.bind_account_id.as_deref(), instance_dir, Some(&launch_proxy)).await?;
     modules::codex_proxy_launch_guard::verify_profile(instance_dir, instance.bind_account_id.as_deref().unwrap_or("__client__"), &launch_proxy)?;
     launch_proxy.append_electron_args(&mut injection_plan.args);
     emit_codex_instance_launch_step(

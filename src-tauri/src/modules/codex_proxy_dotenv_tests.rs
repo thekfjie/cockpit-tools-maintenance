@@ -97,3 +97,36 @@ fn recoverable_dotenv_journal_completes_both_crash_windows_and_retains_conflicts
     assert_eq!(fs::read_to_string(home.join(".env")).unwrap(), "USER=newer");
     assert!(!fs::read_to_string(path).unwrap().contains("USER="));
 }
+
+#[test]
+fn editable_client_proxy_values_restore_originals_and_do_not_cross_accounts() {
+    let original = Some("HTTPS_PROXY=http://original.invalid:7890\nKEEP=untouched\n".to_string());
+    let (mut a, projected) = transition_with_env(State::default(), original.clone(), "a",
+        &CodexLaunchProxy::ClientDefaults, Some("HTTPS_PROXY=http://account-a.invalid:8080\n")).unwrap();
+    a.pending = None;
+    let variables = parse_proxy_variables(projected.as_deref().unwrap()).unwrap();
+    assert_eq!(variables["https_proxy"], "http://account-a.invalid:8080");
+    assert!(projected.as_deref().unwrap().contains("KEEP=untouched"));
+    let edited = projected.map(|v| v.replace("KEEP=untouched", "KEEP=edited"));
+    let (_, b) = transition_with_env(a.clone(), edited.clone(), "b", &CodexLaunchProxy::ClientDefaults, None).unwrap();
+    assert_eq!(parse_proxy_variables(b.as_deref().unwrap()).unwrap()["https_proxy"], "http://original.invalid:7890");
+    assert!(b.unwrap().contains("KEEP=edited"));
+    let (_, independent) = transition_with_env(a.clone(), edited.clone(), "a", &route(41002),
+        Some("HTTPS_PROXY=http://ignored.invalid:8080\n")).unwrap();
+    assert_eq!(parse_proxy_variables(independent.as_deref().unwrap()).unwrap()["https_proxy"], "socks5://127.0.0.1:41002");
+    let (_, direct) = transition_with_env(a, edited, "a", &CodexLaunchProxy::Direct,
+        Some("HTTPS_PROXY=http://ignored.invalid:8080\n")).unwrap();
+    assert_eq!(parse_proxy_variables(direct.as_deref().unwrap()).unwrap()["https_proxy"], "");
+}
+#[test]
+fn empty_manual_proxy_document_is_reversible_and_managed_edits_are_detected() {
+    let original = Some("HTTPS_PROXY=http://original.invalid:7890\nKEEP=value\n".to_string());
+    let (mut state, projected) = transition_with_env(State::default(), original.clone(), "a",
+        &CodexLaunchProxy::ClientDefaults, Some("")).unwrap();
+    state.pending = None;
+    assert!(parse_proxy_variables(projected.as_deref().unwrap()).unwrap().is_empty());
+    let (_, restored) = transition(state.clone(), projected.clone(), "b", &CodexLaunchProxy::ClientDefaults).unwrap();
+    assert_eq!(restored, original);
+    let edited = projected.map(|v| v.replace(END, "# missing managed marker"));
+    assert_eq!(transition(state, edited, "b", &CodexLaunchProxy::ClientDefaults).err().unwrap(), CONFLICT);
+}

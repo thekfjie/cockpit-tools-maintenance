@@ -17,6 +17,7 @@ import { useEscCloseTopmost } from '../../hooks/useEscClose';
 import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 import { useModalFocusTrap } from '../../hooks/useModalFocusTrap';
 import { CodexProxyPicker } from './CodexProxyPicker';
+import { CodexProxyEnvEditor } from './CodexProxyEnvEditor';
 import { CodexProxyCountryGuard } from './CodexProxyCountryGuard';
 import { CodexProxyRecentRequests } from './CodexProxyRecentRequests';
 import { CodexProxyRuntimeStatusPanel, useCodexProxyRuntimeStatus } from './CodexProxyRuntimeStatus';
@@ -38,6 +39,8 @@ export function CodexProxyAccountDialog({ accountId, initialTab, initialMode, on
   const resolveName = useCodexProxyAccountName();
   const [tab, setTab] = useState(initialTab);
   const [mode, setMode] = useState<'follow' | 'independent' | 'disabled' | 'client'>(() => initialMode ?? (editor.clientDefaults ? 'client' : editor.proxyDisabled ? 'disabled' : editor.bound ? 'independent' : 'follow'));
+  const [envRevision, setEnvRevision] = useState(0);
+  const [envDirty, setEnvDirty] = useState(false);
   const [noteOpen, setNoteOpen] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [catalogPending, setCatalogPending] = useState(false);
@@ -106,7 +109,8 @@ export function CodexProxyAccountDialog({ accountId, initialTab, initialMode, on
                 <small>{t(value === 'client' ? 'codex.proxy.clientHint' : value === 'disabled' ? 'codex.proxy.disabledHint' : value === 'follow' ? 'codex.proxy.managerAccounts.followHint' : 'codex.proxy.managerAccounts.independentHint')}</small></span>
             </button>)}
           </div>
-          {mode === 'client' ? <p className="codex-proxy-page-note">{t('codex.proxy.clientHint')}</p> : mode === 'disabled' ? <p className="codex-proxy-page-note">{t('codex.proxy.disabledWarning')}</p> : mode === 'follow' ? <div className="codex-proxy-account-follow-preview"><ShieldCheck size={21} /><div>
+          {mode === 'client' ? <CodexProxyEnvEditor key={accountId} accountId={accountId} disabled={measuring || !targetReady}
+            onDirtyChange={setEnvDirty} onSaved={() => setEnvRevision(value => value + 1)} /> : mode === 'disabled' ? <p className="codex-proxy-page-note">{t('codex.proxy.disabledWarning')}</p> : mode === 'follow' ? <div className="codex-proxy-account-follow-preview"><ShieldCheck size={21} /><div>
             <span>{t('codex.proxy.managerAccounts.proxy')}</span><strong>{unifiedErrorKey ? t(unifiedErrorKey) : !unified ? t('common.loading') : activeUnified ? sharedLabel : t('codex.proxy.modeDefault')}</strong>
             {unifiedErrorKey && <button type="button" className="btn btn-secondary compact" onClick={reloadUnified}>{t('common.retry')}</button>}
           </div></div> : <div className="codex-proxy-account-choice">
@@ -131,7 +135,7 @@ export function CodexProxyAccountDialog({ accountId, initialTab, initialMode, on
             </div>
           </div>}
           <p className="codex-proxy-page-note">{t('codex.proxy.restartHint')}</p>
-          <CodexProxyCountryGuard key={accountId} accountId={accountId} disabled={measuring || !targetReady} />
+          <CodexProxyCountryGuard key={accountId} revision={envRevision} routeDirty={canSave || (mode === "client" && envDirty)} accountId={accountId} disabled={measuring || !targetReady} />
         </> : <div className="codex-proxy-account-details">
           <CodexProxyRuntimeStatusPanel accountId={accountId} revision={editor.savedBinding} desktopOnly={accountId === CODEX_API_SERVICE_PROXY_TARGET} />
           <div className="codex-proxy-account-check-actions">

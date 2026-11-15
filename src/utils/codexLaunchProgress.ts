@@ -23,6 +23,7 @@ export function codexLaunchErrorKey(error: unknown): string | null {
     return 'codex.launchErrors.proxyEntryFailed';
   }
   const launchProxyErrors: Record<string, string> = {
+    PROXY_ENV_INVALID: 'codex.proxy.env.invalid',
     PROXY_ENV_CHANGED: 'codex.proxy.launch.envChanged',
     PROXY_ENV_STORAGE: 'codex.proxy.launch.envStorage',
     PROXY_ENV_UNSUPPORTED: 'codex.proxy.launch.envUnsupported',
@@ -54,6 +55,7 @@ export type CodexLaunchStepId =
   | 'stopPrevious'
   | 'prepareCredentials'
   | 'writeProfile'
+  | 'checkProxyCountry'
   | 'startClient';
 
 export type CodexLaunchStepStatus =
@@ -88,6 +90,7 @@ const SWITCH_STEP_MAP: Record<string, CodexLaunchStepId> = {
   stopRuntime: 'stopPrevious',
   writeCredentials: 'writeProfile',
   syncSettings: 'writeProfile',
+  checkProxyCountry: 'checkProxyCountry',
   startClient: 'startClient',
 };
 

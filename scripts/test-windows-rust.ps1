@@ -58,7 +58,7 @@ try {
 
     $filters = @('account_project_switch', 'local_projects', 'history_projection_repair',
         'provider_gateway_port_probe', 'occupied_persisted_gateway_port_is_released_before_start',
-        'codex_proxy_dotenv', 'codex_proxy_launch_guard', 'codex_account_proxy',
+        'codex_proxy_dotenv', 'codex_proxy_env', 'codex_proxy_launch_guard', 'codex_account_proxy',
         'codex_client_proxy::tests', 'codex_proxy_desktop_router::tests', 'codex_direct_launch_tests',
         'quota_proxy_persistence')
     $failedFilters = @()

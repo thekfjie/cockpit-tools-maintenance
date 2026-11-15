@@ -198,3 +198,24 @@
   max-width: 360px;
   margin: 12px 0;
 }
+
+/* Keep account settings in the existing single-column flow. */
+.codex-proxy-env-editor,
+.codex-proxy-country-guard {
+  margin-top: 16px; padding: 18px; border: 1px solid var(--border-color);
+  border-radius: 12px; background: var(--bg-secondary);
+}
+.codex-proxy-env-editor h3,
+.codex-proxy-country-evidence h3 { margin: 0 0 10px; font-size: 14px; }
+.codex-proxy-env-input {
+  width: 100%; min-height: 130px; resize: vertical; box-sizing: border-box;
+  font: 13px/1.7 ui-monospace, Consolas, monospace; color: var(--text-primary);
+  background: var(--bg-primary); border: 1px solid var(--border-color);
+  border-radius: 8px; padding: 10px 12px;
+}
+.codex-proxy-env-input:focus { outline: 2px solid var(--primary); outline-offset: 1px; }
+.codex-proxy-country-evidence { margin-top: 18px; padding: 16px; border: 1px solid var(--border-color); border-radius: 10px; background: var(--bg-primary); }
+.codex-proxy-country-result { margin: 10px 0 14px; font-size: 13px; line-height: 1.6; }
+.codex-proxy-country-result dt { color: var(--text-secondary); margin-top: 8px; }
+.codex-proxy-country-result dd { margin: 0; overflow-wrap: anywhere; }
+.codex-proxy-country-history-item { padding: 12px 0; border-top: 1px solid var(--border-color); }

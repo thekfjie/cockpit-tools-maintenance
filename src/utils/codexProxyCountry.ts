@@ -2,11 +2,13 @@ import countryCodes from '../data/codexCountryCodes.json';
 
 type RegionNames = { of(code: string): string | undefined };
 type RegionNamesConstructor = new (locales: string[], options: { type: 'region' }) => RegionNames;
-export function codexCountryOptions(language: string): { value: string; label: string }[] {
+export function codexCountryOptions(language: string): { value: string; label: string; searchText: string }[] {
   const DisplayNames = (Intl as unknown as { DisplayNames?: RegionNamesConstructor }).DisplayNames;
   let names: RegionNames | undefined;
   try { names = DisplayNames ? new DisplayNames([language], { type: 'region' }) : undefined; } catch { /* ISO codes remain usable. */ }
-  return countryCodes.map(code => ({ value: code, label: `${names?.of(code) ?? code} (${code})` }))
+  let english: RegionNames | undefined;
+  try { english = DisplayNames ? new DisplayNames(['en'], { type: 'region' }) : undefined; } catch { /* Codes remain searchable. */ }
+  return countryCodes.map(code => ({ value: code, label: `${names?.of(code) ?? code} (${code})`, searchText: code + ' ' + (english?.of(code) ?? '') }))
     .sort((a, b) => a.label.localeCompare(b.label));
 }
 export function codexCountryErrorValues(error: unknown): Record<string, string> {

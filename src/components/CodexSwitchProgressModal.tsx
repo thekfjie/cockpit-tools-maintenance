@@ -1,3 +1,5 @@
+import { useCodexCountryProgress } from './useCodexCountryProgress';
+import { countryProgressLines } from '../utils/codexCountryProgress';
 import { codexCountryErrorValues } from '../utils/codexProxyCountry';
 import { resolveCodexAccountDisplayName } from "../utils/codexAccountDisplayName";
 import { useEffect, useMemo, useState } from "react";
@@ -31,6 +33,7 @@ type SwitchStepId =
   | "refreshTokens"
   | "writeCredentials"
   | "syncSettings"
+  | "checkProxyCountry"
   | "startClient";
 type SwitchStepStatus =
   "pending" | "running" | "completed" | "warning" | "skipped" | "error";
@@ -76,6 +79,7 @@ const STEP_IDS: SwitchStepId[] = [
   "stopRuntime",
   "writeCredentials",
   "syncSettings",
+  "checkProxyCountry",
   "startClient",
 ];
 
@@ -87,7 +91,7 @@ function createProgressState(
     accountId,
     progress: 4,
     status: "running",
-    steps: STEP_IDS.map((id) => ({ id, status: "pending", details: {} })),
+    steps: STEP_IDS.map((id) => ({ id, status: id === "checkProxyCountry" ? "skipped" : "pending", details: {} })),
     launchAfterSwitch,
   };
 }
@@ -109,6 +113,7 @@ function optionalTimestamp(value: unknown): number | null {
 export function CodexSwitchProgressModal() {
   const { t, i18n } = useTranslation();
   const [state, setState] = useState<SwitchProgressState | null>(null);
+  useCodexCountryProgress(setState);
   const [actionBusy, setActionBusy] = useState<"api" | null>(null);
   const [retryBusy, setRetryBusy] = useState<"retry" | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
@@ -150,7 +155,11 @@ export function CodexSwitchProgressModal() {
               : detail.authFailure;
           const isAuthRequired = authFailure != null;
           const steps = base.steps.map((step) => ({ ...step }));
-          let targetIndex = steps.findIndex(
+          const countryFailed = steps.some(step => step.id === "checkProxyCountry" && step.status === "error");
+          if (countryFailed) for (const step of steps) {
+            if (step.id !== "checkProxyCountry" && step.status === "running") step.status = "pending";
+          }
+          let targetIndex = countryFailed ? steps.findIndex(step => step.id === "checkProxyCountry") : steps.findIndex(
             (step) => step.status === "running",
           );
           if (targetIndex < 0) {
@@ -323,6 +332,8 @@ export function CodexSwitchProgressModal() {
   const stepDetailLines = (step: SwitchStepState): string[] => {
     const { details, status } = step;
     switch (step.id) {
+      case "checkProxyCountry":
+        return status === "skipped" ? [t("codex.proxy.country.notRequired")] : countryProgressLines(details, t);
       case "credentials": {
         if (status === "running") {
           return [t("codex.switchProgress.detail.readingCredentials")];
@@ -433,6 +444,7 @@ export function CodexSwitchProgressModal() {
   };
 
   const activeStep =
+    state.steps.find(step => step.id === "checkProxyCountry" && step.status === "running") ||
     state.steps.find((step) => step.status === "running") ||
     [...state.steps].reverse().find((step) => step.status === "error") ||
     [...state.steps]

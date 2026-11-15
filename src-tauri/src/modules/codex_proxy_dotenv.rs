@@ -23,7 +23,7 @@ struct State {
     pending: Option<Pending>,
 }
 #[derive(Clone, Serialize, Deserialize)]
-struct Owned { account: String, original: Option<String>, block: String }
+struct Owned { account: String, original: Option<String>, block: String, #[serde(default)] replace_proxy: bool }
 #[derive(Clone, Serialize, Deserialize)]
 struct Pending { before: Option<String>, after: Option<String> }
 
@@ -104,11 +104,26 @@ fn unproject(current: Option<&str>, active: &Owned) -> Result<Option<String>, St
     if current.matches(active.block.as_str()).count() != 1 { return Err(CONFLICT.into()); }
     let text = current.replacen(active.block.as_str(), "", 1);
     if text.contains(BEGIN) || text.contains(END) { return Err(CONFLICT.into()); }
+    if active.replace_proxy {
+        let stripped = merge_defaults(active.original.as_deref(), Some(""))?;
+        if text == stripped.as_deref().unwrap_or("") { return Ok(active.original.clone()); }
+        return merge_defaults(Some(&text), active.original.as_deref());
+    }
     // Preserve absent versus empty, plus edits to unrelated settings made while managed.
     Ok(if text.is_empty() && active.original.is_none() { None } else { Some(text) })
 }
 
-fn transition(mut state: State, current: Option<String>, account: &str, proxy: &CodexLaunchProxy)
+#[cfg(test)]
+fn transition(state: State, current: Option<String>, account: &str, proxy: &CodexLaunchProxy)
+    -> Result<(State, Option<String>), String> {
+    transition_with_env(state, current, account, proxy, None)
+}
+fn account_transition(state: State, current: Option<String>, account: &str, proxy: &CodexLaunchProxy)
+    -> Result<(State, Option<String>), String> {
+    let saved = if matches!(proxy, CodexLaunchProxy::ClientDefaults) { super::codex_proxy_env::saved_document(account)? } else { None };
+    transition_with_env(state, current, account, proxy, saved.as_deref())
+}
+fn transition_with_env(mut state: State, current: Option<String>, account: &str, proxy: &CodexLaunchProxy, saved: Option<&str>)
     -> Result<(State, Option<String>), String> {
     let original = if let Some(active) = state.active.take() {
         let original = unproject(current.as_deref(), &active)?;
@@ -130,8 +145,13 @@ fn transition(mut state: State, current: Option<String>, account: &str, proxy: &
     parts(original.as_deref().unwrap_or(""))?;
     if state.defaults.len() >= 128 && !state.defaults.contains_key(account) { return Err(ERROR.into()); }
     state.defaults.insert(account.to_owned(), original.clone());
-    let pairs = proxy.dotenv_overrides()?;
-    let after = if pairs.is_empty() {
+    let manual = matches!(proxy, CodexLaunchProxy::ClientDefaults) && saved.is_some();
+    let pairs: Vec<(String, String)> = if manual {
+        super::codex_proxy_env::normalize_document(saved.unwrap_or_default())?;
+        parse_proxy_variables(saved.unwrap_or_default())?.into_iter().map(|(name, value)| (name.to_ascii_uppercase(), value)).collect()
+    } else { proxy.dotenv_overrides()?.into_iter().map(|(name, value)| (name.to_owned(), value)).collect() };
+    let projected_original = if manual { merge_defaults(original.as_deref(), Some(""))? } else { original.clone() };
+    let after = if pairs.is_empty() && !manual {
         original
     } else {
         let mut block = String::from("\n");
@@ -142,9 +162,9 @@ fn transition(mut state: State, current: Option<String>, account: &str, proxy: &
             block.push_str(&format!("{name}='{value}'\n"));
         }
         block.push_str(END); block.push('\n');
-        let projected = format!("{}{block}", original.as_deref().unwrap_or(""));
+        let projected = format!("{}{block}", projected_original.as_deref().unwrap_or(""));
         if projected.len() > MAX_DOCUMENT { return Err(ERROR.into()); }
-        state.active = Some(Owned { account: account.into(), original, block });
+        state.active = Some(Owned { account: account.into(), original, block, replace_proxy: manual });
         Some(projected)
     };
     state.last_account = Some(account.to_owned());
@@ -202,9 +222,9 @@ fn apply_inner(home: &Path, account: &str, proxy: &CodexLaunchProxy) -> Result<(
     }
     // With no takeover and no explicit route, leave the original file untouched.
     if state.active.is_none() && proxy.dotenv_overrides()?.is_empty() {
-        if !path.exists() { return Ok(()); }
+        if !path.exists() && super::codex_proxy_env::saved_document(account)?.is_none() { return Ok(()); }
     }
-    let (mut next, after) = transition(state, current.clone(), account, proxy)?;
+    let (mut next, after) = account_transition(state, current.clone(), account, proxy)?;
     // Write-ahead journal makes a crash between .env and state writes recoverable.
     write_state(&path, &next)?;
     if !atomic_write::replace_private_string_preserving_backups_if_matches(&env, current.as_deref(), after.as_deref()).map_err(|_| ERROR)? {
@@ -219,14 +239,15 @@ fn apply_inner(home: &Path, account: &str, proxy: &CodexLaunchProxy) -> Result<(
 mod tests;
 
 pub fn verify(home: &Path, account: &str, proxy: &CodexLaunchProxy) -> Result<(), String> {
-    if proxy.dotenv_overrides()?.is_empty() { return Ok(()); }
+    if proxy.dotenv_overrides()?.is_empty()
+        && !(matches!(proxy, CodexLaunchProxy::ClientDefaults) && super::codex_proxy_env::saved_document(account)?.is_some()) { return Ok(()); }
     let _write = WRITES.lock().map_err(|_| ERROR)?;
     let state = read_state(&state_path(home)?)?;
     if state.pending.is_some() { return Err(CONFLICT.into()); }
     let active = state.active.as_ref().filter(|a| a.account == account).ok_or(CONFLICT)?;
     let current = read_document(&home.join(".env"))?;
     unproject(current.as_deref(), active)?;
-    let (_, expected) = transition(state, current.clone(), account, proxy)?;
+    let (_, expected) = account_transition(state, current.clone(), account, proxy)?;
     if current != expected { return Err(CONFLICT.into()); }
     Ok(())
 }
@@ -242,9 +263,13 @@ pub(crate) fn preview_proxy_variables(home: &Path, account: &str, proxy: &CodexL
         if current != pending.before && current != pending.after { return Err(CONFLICT.into()); }
         current = pending.after;
     }
-    let (_, projected) = transition(state, current, account, proxy)?;
+    let (_, projected) = account_transition(state, current, account, proxy)?;
+    parse_proxy_variables(projected.as_deref().unwrap_or(""))
+}
+
+pub(crate) fn parse_proxy_variables(document: &str) -> Result<BTreeMap<String, String>, String> {
     let mut variables = BTreeMap::new();
-    for (part, is_proxy) in parts(projected.as_deref().unwrap_or(""))? {
+    for (part, is_proxy) in parts(document)? {
         if !is_proxy { continue; }
         let name = key(part).ok_or(ERROR)?.to_ascii_lowercase();
         let (_, raw) = part.split_once('=').ok_or(ERROR)?;

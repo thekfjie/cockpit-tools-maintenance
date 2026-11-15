@@ -11,13 +11,17 @@ function harness(initial: string | null = null, readFails = false) {
   const t = (key: string) => key;
   const h = loadHookModule(new URL('./CodexProxyCountryGuard.tsx', import.meta.url), {
     'react-i18next': { useTranslation: () => ({ t, i18n: { language: 'en' } }) },
-    '../SingleSelectDropdown': { SingleSelectDropdown: 'country-select' },
+    './CodexProxySelect': { CodexProxySelect: 'country-select' },
+    '@tauri-apps/api/event': { listen: async () => () => {} },
     '../ModalErrorMessage': { ModalErrorMessage: 'error-message' },
     '../../utils/codexProxyCountry': {
       codexCountryOptions: () => [{ value: 'JP', label: 'Japan' }, { value: 'SG', label: 'Singapore' }],
+      codexCountryErrorValues: () => ({}),
       codexCountryErrorKey: () => 'codex.proxy.country.storage',
     },
     '../../services/codexProxyCountryService': {
+      getCodexCountryChecks: async () => [],
+      checkCodexCountry: async () => { throw new Error('unexpected check'); },
       getCodexProxyCountryPolicy: async () => { if (readFails) throw new Error('storage'); return { expectedCountry: initial }; },
       setCodexProxyCountryPolicy: async (...args: unknown[]) => { calls.push(args); return { expectedCountry: args[1] }; },
     },

@@ -90,3 +90,40 @@ async fn country_policy_is_optional_per_account_and_normalizes_gateway_bindings(
     assert_eq!(policy("b").unwrap().expected_country.as_deref(),Some("SG"));
     assert!(!root.join("missing-profile").exists());
 }
+
+#[test]
+fn country_check_history_is_account_scoped_bounded_and_invalidated_by_network_changes() {
+    let _lock = crate::modules::test_support::env_lock().lock().unwrap_or_else(|e| e.into_inner());
+    let root = std::env::temp_dir().join(format!("country-evidence-{}", uuid::Uuid::new_v4()));
+    std::fs::create_dir_all(root.join("home")).unwrap();
+    let keys = ["COCKPIT_TOOLS_TEST_DATA_DIR", "COCKPIT_TOOLS_DATA_DIR"];
+    let previous = keys.map(std::env::var_os);
+    struct Cleanup(PathBuf, [Option<std::ffi::OsString>; 2]);
+    impl Drop for Cleanup {
+        fn drop(&mut self) {
+            for (key, value) in ["COCKPIT_TOOLS_TEST_DATA_DIR", "COCKPIT_TOOLS_DATA_DIR"].into_iter().zip(&self.1) {
+                match value { Some(value) => std::env::set_var(key, value), None => std::env::remove_var(key) }
+            }
+            let _ = std::fs::remove_dir_all(&self.0);
+        }
+    }
+    let _cleanup = Cleanup(root.clone(), previous);
+    for key in keys { std::env::set_var(key, root.join("app")); }
+    let home = root.join("home");
+    let account = format!("evidence-{}", uuid::Uuid::new_v4());
+    let signature = configuration_signature(&account, &home).unwrap();
+    for index in 0..15 {
+        record_check(None, &CountryCheck { check_id: format!("{index}"), account_id: account.clone(), scope: "launch".into(),
+            expected_country: Some("JP".into()), actual_country: Some("SG".into()), status: "blocked".into(),
+            checked_at: index, elapsed_ms: 12, source: "account".into(),
+            reason: Some("PROXY_COUNTRY_MISMATCH:JP:SG".into()), stale: false }, &home, &signature);
+    }
+    let items = recent_checks(&account).unwrap();
+    assert_eq!(items.len(), 12);
+    assert!(!items.last().unwrap().stale);
+    assert!(recent_checks("different-account").unwrap().is_empty());
+    std::fs::write(home.join(".env"), "HTTPS_PROXY=http://changed.invalid:7890\n").unwrap();
+    assert!(recent_checks(&account).unwrap().last().unwrap().stale);
+    invalidate_report(&account);
+    assert!(recent_checks(&account).unwrap().is_empty());
+}

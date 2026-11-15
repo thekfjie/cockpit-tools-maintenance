@@ -42,3 +42,25 @@ shortcuts. Opening Codex directly is outside the Cockpit startup check.
 Tests use temporary profiles, generated policies and loopback sockets. They do
 not install or start the user's Codex, switch a real account, or use account tokens.
 Windows builds and regression checks run on GitHub Actions.
+
+## Visible checks and editable client proxy variables
+
+Country checking is a separate launch-progress step. Failure remains attached to
+that step, retry repeats it, and the launch action cannot skip it. The account
+dialog keeps its vertical layout and uses the existing searchable picker with
+localized names, English names and ISO codes.
+
+The independent results area shows expected/observed country, route source,
+timestamp, duration and safe failure reason. Records are scoped to the account
+and current Cockpit session, bounded to twelve entries. Persistent application
+logs record the outcome without proxy URLs, credentials or IP addresses. Saved
+network settings invalidate previous evidence; manual checks never start Codex.
+
+Client settings shows recognized proxy assignments in one editable text area.
+Only HTTP_PROXY, HTTPS_PROXY, ALL_PROXY and NO_PROXY are accepted, including
+case aliases. Recognition failure allows manual input, but storage failure does
+not silently overwrite saved settings. The encrypted per-account preference is
+staged outside CODEX_HOME and applied at the next stopped-profile launch using
+client settings. The existing ownership journal restores original proxy entries
+on account changes and preserves unrelated .env contents. Independent/shared
+proxy modes and force-direct continue using their existing behavior.

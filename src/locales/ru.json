@@ -977,7 +977,8 @@
         "stopPrevious": "Остановка прежнего экземпляра",
         "prepareCredentials": "Подготовка данных входа",
         "writeProfile": "Запись профиля экземпляра",
-        "startClient": "Запуск клиента Codex"
+        "startClient": "Запуск клиента Codex",
+        "checkProxyCountry": "Check exit country"
       },
       "detail": {
         "checkingInstance": "Чтение конфигурации экземпляра...",
@@ -4514,7 +4515,8 @@
         "refreshTokens": "Обновить данные входа",
         "writeCredentials": "Записать данные клиента",
         "syncSettings": "Синхронизировать настройки",
-        "startClient": "Запустить клиент Codex"
+        "startClient": "Запустить клиент Codex",
+        "checkProxyCountry": "Check exit country"
       },
       "status": {
         "pending": "Ожидание",
@@ -5872,7 +5874,54 @@
         "routeUnknown": "Не удалось определить прокси-маршрут клиента. Codex не запущен; проверьте прокси клиента и .env.",
         "changed": "Настройки страны изменились во время проверки. Повторите проверку текущих настроек.",
         "storage": "Не удалось прочитать или сохранить настройки страны.",
-        "invalid": "Выберите допустимую страну или регион."
+        "invalid": "Выберите допустимую страну или регион.",
+        "search": "Search country name or code",
+        "actual": "Observed country or region",
+        "route": "Check route",
+        "checkedAt": "Check time",
+        "notDetected": "Not detected",
+        "notRequired": "Not enabled",
+        "resultTitle": "Exit country check result",
+        "evidenceHint": "Checks the saved HTTP launch route only. Recent records are from this Cockpit session; application logs retain the outcome. A past result does not certify the current connection.",
+        "saveFirst": "Save the proxy mode and country settings before checking.",
+        "noChecks": "No checks in this session.",
+        "checkNow": "Check now",
+        "history": "Earlier checks in this session",
+        "historyFailed": "Could not read recent country checks.",
+        "result_checking": "Checking exit country…",
+        "result_passed": "Check passed",
+        "result_blocked": "Check failed",
+        "result_stale": "Settings changed; check again",
+        "route_account": "Cockpit account proxy",
+        "route_direct": "Explicit direct route",
+        "route_env": "Client .env",
+        "route_environment": "Inherited environment",
+        "route_system": "Windows system proxy",
+        "route_network": "Default network route",
+        "route_unknown": "Not resolved",
+        "progressCountries": "Expected: {{expected}} · Observed: {{actual}}",
+        "progressTime": "Elapsed: {{ms}} ms"
+      },
+      "env": {
+        "title": "Client proxy environment",
+        "source": "Recognized source: {{source}}",
+        "source_saved": "Saved for this account",
+        "source_env": "Client .env",
+        "source_environment": "Inherited environment",
+        "source_system": "Windows system proxy",
+        "source_none": "No explicit proxy recognized",
+        "source_unknown": "Not recognized",
+        "hint": "Only HTTP_PROXY, HTTPS_PROXY, ALL_PROXY and NO_PROXY are accepted. Save applies on the next Cockpit launch using client settings; other .env entries are preserved.",
+        "variables": "Proxy variables",
+        "recognize": "Read again",
+        "save": "Save ENV settings",
+        "saved": "Saved for the next launch",
+        "unrecognized": "Could not safely read the existing proxy variables. You can enter literal values here; the client file is not changed now.",
+        "noneHint": "No explicit proxy was found. This does not determine whether a TUN or another network layer is active.",
+        "readFailed": "Could not read saved ENV settings. Retry before editing.",
+        "saveFailed": "Could not save ENV settings.",
+        "changed": "These settings changed elsewhere. Read again before saving.",
+        "invalid": "Enter only HTTP_PROXY, HTTPS_PROXY, ALL_PROXY or NO_PROXY assignments with literal values. Proxy URLs must use http, https, socks5 or socks5h. Do not duplicate names."
       }
     },
     "more": {

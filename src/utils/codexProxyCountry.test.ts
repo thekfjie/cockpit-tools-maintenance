@@ -7,6 +7,7 @@ test('country options cover ISO countries without guessing the region from node 
   assert.equal(options.length, 249);
   assert.equal(new Set(options.map(option => option.value)).size, 249);
   assert.match(options.find(option => option.value === 'JP')!.label, /JP/);
+  assert.match(options.find(option => option.value === 'JP')!.searchText, /Japan/);
   assert.match(options.find(option => option.value === 'SG')!.label, /SG/);
 });
 test('country errors display only the verified expected and actual country codes', () => {

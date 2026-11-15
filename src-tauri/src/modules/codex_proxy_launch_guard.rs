@@ -17,7 +17,7 @@ fn country_valid(value: &str) -> bool {
         serde_json::from_str::<Vec<String>>(include_str!("../../../src/data/codexCountryCodes.json"))
             .is_ok_and(|codes| codes.iter().any(|code| code == value))
 }
-fn policy_key(account: &str) -> Result<String, String> {
+pub(crate) fn policy_key(account: &str) -> Result<String, String> {
     let account = account.trim();
     if account.is_empty() || account.len() > 256 || account.chars().any(char::is_control) {
         return Err(STORAGE.into());
@@ -55,6 +55,7 @@ pub fn save_policy(account: &str, expected: Option<String>) -> Result<CountryPol
     } else { policies.remove(&key); }
     let raw = super::secure_account_storage::serialize_account_file("codex-proxy-country", &policies).map_err(|_| STORAGE)?;
     super::atomic_write::write_secret_string_atomic(&path, &raw).map_err(|_| STORAGE)?;
+    invalidate_report(account);
     Ok(CountryPolicy { expected_country: expected })
 }
 fn parse_country(body: &[u8]) -> Result<String, String> {
@@ -89,37 +90,30 @@ async fn query_country(client: &reqwest::Client, endpoint: &str) -> Result<Strin
     parse_country(&body)
 }
 pub async fn check_for_launch(account: Option<&str>, home: &Path) -> Result<(), String> {
-    if !cfg!(windows) { return Ok(()); }
-    let bound = account;
-    let account = account.unwrap_or("__client__");
-    let expected = policy(account)?.expected_country;
-    let Some(expected) = expected else { return Ok(()); };
-    // Account proxy resolution does not authenticate or request a model.
-    let proxy = super::codex_instance::resolve_egress_proxy_for_bind_account(bound).await?;
-    check_route(account, home, &proxy, &expected).await?;
-    if policy(account)?.expected_country.as_deref() != Some(expected.as_str()) {
-        return Err("PROXY_COUNTRY_CHANGED".into());
-    }
-    Ok(())
+    run_check(None, account, home, "launch", None).await.map(|_| ())
 }
-async fn check_route(account: &str, home: &Path, proxy: &CodexLaunchProxy, expected: &str) -> Result<(), String> {
-    let (route, bypass) = match proxy {
-        CodexLaunchProxy::Proxy(url) => { proxy.dotenv_overrides()?; (Some(url.clone()), None) },
-        CodexLaunchProxy::Direct => (None, None),
+pub async fn check_launch(app: &tauri::AppHandle, account: Option<&str>, home: &Path, proxy: Option<&CodexLaunchProxy>) -> Result<(), String> {
+    run_check(Some(app), account, home, "launch", proxy).await.map(|_| ())
+}
+fn route_for_check(account: &str, home: &Path, proxy: &CodexLaunchProxy) -> Result<(Option<String>, Option<String>, &'static str), String> {
+    Ok(match proxy {
+        CodexLaunchProxy::Proxy(url) => { proxy.dotenv_overrides()?; (Some(url.clone()), None, "account") },
+        CodexLaunchProxy::Direct => (None, None, "direct"),
         CodexLaunchProxy::Inherit | CodexLaunchProxy::ClientDefaults => {
             let mut env = super::process::proxy_environment_for_check(proxy);
-            env.extend(super::codex_proxy_dotenv::preview_proxy_variables(home, account, proxy)?);
-            let explicit = env.get("https_proxy").filter(|s| !s.trim().is_empty())
-                .or_else(|| env.get("all_proxy").filter(|s| !s.trim().is_empty())).cloned();
-            let route = explicit.or_else(|| super::codex_local_access::system_proxy_url_for_target(ENDPOINT));
-            (route, env.get("no_proxy").cloned())
+            let local = super::codex_proxy_dotenv::preview_proxy_variables(home, account, proxy)?;
+            env.extend(local.clone());
+            let explicit_key = ["https_proxy", "all_proxy"].into_iter().find(|k| env.get(*k).is_some_and(|v| !v.trim().is_empty()));
+            let explicit = explicit_key.and_then(|k| env.get(k)).cloned();
+            let source = if explicit_key.is_some_and(|k| local.contains_key(k)) { "env" } else { "environment" };
+            if explicit.is_some() { (explicit, env.get("no_proxy").cloned(), source) }
+            else if let Some(url) = super::codex_local_access::system_proxy_url_for_target(ENDPOINT) {
+                (Some(url), env.get("no_proxy").cloned(), "system")
+            } else { (None, env.get("no_proxy").cloned(), "network") }
         },
-    };
-    let client = probe_client(route.as_deref(), bypass.as_deref())?;
-    let actual = tokio::time::timeout(Duration::from_secs(15), query_country(&client, ENDPOINT))
-        .await.map_err(|_| UNKNOWN)??;
-    compare_country(expected, &actual)
+    })
 }
+include!("codex_proxy_country_reports.rs");
 pub fn verify_profile(home: &Path, account: &str, proxy: &CodexLaunchProxy) -> Result<(), String> {
     if !cfg!(windows) { return Ok(()); }
     super::codex_proxy_dotenv::verify(home, account, proxy)

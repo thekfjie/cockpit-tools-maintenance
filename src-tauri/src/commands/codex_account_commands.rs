@@ -1152,7 +1152,7 @@ async fn switch_codex_account_internal(
                 let target = crate::commands::codex_instance::resolve_codex_instance_start_target(
                     crate::commands::codex_instance::DEFAULT_INSTANCE_ID,
                 )?;
-                crate::modules::codex_proxy_launch_guard::check_for_launch(Some(&account_id), &target.user_data_dir).await
+                crate::modules::codex_proxy_launch_guard::check_launch(&app, Some(&account_id), &target.user_data_dir, None).await
             }.await {
                 let _ = app.emit("codex:switch-progress", serde_json::json!({
                     "accountId": account_id, "type": "error", "error": error, "canRetry": true,
