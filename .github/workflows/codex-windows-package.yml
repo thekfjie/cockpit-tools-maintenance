@@ -1,0 +1,83 @@
+name: Windows maintenance build
+run-name: Windows maintenance · ${{ github.ref_name }}
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: maintenance-windows-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 90
+    env:
+      CARGO_TERM_COLOR: always
+      CARGO_PROFILE_RELEASE_DEBUG: "0"
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - uses: dtolnay/rust-toolchain@stable
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: ". -> target"
+          shared-key: maintenance-windows-release-v1
+          cache-on-failure: true
+          cache-workspace-crates: true
+      - name: Format new Rust modules
+        shell: pwsh
+        run: |
+          rustfmt --edition 2021 --config skip_children=true src-tauri/src/commands/codex_proxy_country.rs
+          rustfmt --edition 2021 --config skip_children=true src-tauri/src/modules/codex_proxy_country_reports.rs
+          rustfmt --edition 2021 --config skip_children=true src-tauri/src/modules/codex_proxy_dotenv.rs
+          rustfmt --edition 2021 --config skip_children=true src-tauri/src/modules/codex_proxy_dotenv_tests.rs
+          rustfmt --edition 2021 --config skip_children=true src-tauri/src/modules/codex_proxy_env.rs
+          rustfmt --edition 2021 --config skip_children=true src-tauri/src/modules/codex_proxy_launch_guard.rs
+          rustfmt --edition 2021 --config skip_children=true src-tauri/src/modules/codex_proxy_launch_guard_tests.rs
+          git diff --binary --output=formatting.patch
+      - name: Install frontend dependencies
+        run: npm ci --prefer-offline --no-audit --no-fund
+      - name: Frontend and release regressions
+        shell: bash
+        run: |
+          set -euo pipefail
+          checks_failed=0
+          npm test 2>&1 | tee frontend-tests.log || checks_failed=1
+          npm run test:release 2>&1 | tee release-tests.log || checks_failed=1
+          node scripts/check_locales.cjs || checks_failed=1
+          exit "$checks_failed"
+      - name: Production frontend and type check
+        id: frontend-build
+        if: ${{ !cancelled() }}
+        run: npm run build
+      - name: Account and project compatibility regressions
+        if: ${{ !cancelled() && steps.frontend-build.outcome == 'success' }}
+        shell: pwsh
+        run: ./scripts/test-windows-rust.ps1
+      - name: Core Rust regression tests
+        if: ${{ !cancelled() && steps.frontend-build.outcome == 'success' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cargo test --locked --package cockpit-core -- --test-threads=1 2>&1 | tee core-tests.log
+      - name: Upload source formatting
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: rust-source-formatting
+          path: formatting.patch
+          if-no-files-found: error
+          retention-days: 3
+      - name: Upload validation logs
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: windows-maintenance-logs-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: warn
+          path: |
+            *-tests.log
+            windows-build.log
