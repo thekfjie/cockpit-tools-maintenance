@@ -130,14 +130,20 @@ pub(crate) struct CodexInstanceStartTarget {
 }
 
 impl CodexInstanceStartTarget {
-    pub(crate) async fn preflight_desktop_proxy(&self, app: &AppHandle) -> Result<(), String> {
+    pub(crate) async fn preflight_desktop_proxy(&self, app: Option<&AppHandle>) -> Result<(), String> {
         if launch_mode_uses_desktop_runtime(&self.launch_mode) {
             modules::codex_instance::preflight_egress_proxy_for_bind_account(
                 self.bind_account_id.as_deref(),
             ).await?;
-            modules::codex_proxy_launch_guard::check_launch(
-                app, self.bind_account_id.as_deref(), &self.user_data_dir, None,
-            ).await?;
+            if let Some(app) = app {
+                modules::codex_proxy_launch_guard::check_launch(
+                    app, self.bind_account_id.as_deref(), &self.user_data_dir, None,
+                ).await?;
+            } else {
+                modules::codex_proxy_launch_guard::check_for_launch(
+                    self.bind_account_id.as_deref(), &self.user_data_dir,
+                ).await?;
+            }
         }
         Ok(())
     }
@@ -2673,7 +2679,7 @@ async fn codex_start_instance_internal(
     );
     // Validate the effective route before credentials, profile writes, or stopping
     // the previous client. Metadata/status lookup alone cannot detect a damaged engine.
-    launch_target.preflight_desktop_proxy(&app).await?;
+    launch_target.preflight_desktop_proxy(Some(&app)).await?;
     ensure_codex_instance_start_not_cancelled(&instance_id)?;
     let start_flow_lock =
         CODEX_INSTANCE_START_FLOW_LOCK.get_or_init(|| tokio::sync::Mutex::new(()));

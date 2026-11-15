@@ -55,7 +55,7 @@ pub async fn codex_proxy_instance_preflight(app: tauri::AppHandle, instance_id: 
         })
         .await
         .map_err(|_| "PROXY_RUNTIME_FAILED")??;
-        target.preflight_desktop_proxy(&app).await
+        target.preflight_desktop_proxy(Some(&app)).await
     })
     .await
     .map_err(|_| "PROXY_ENGINE_TIMEOUT".to_string())?
