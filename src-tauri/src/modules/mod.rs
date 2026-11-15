@@ -33,6 +33,8 @@ pub mod codex_device_restrictions;
 pub mod chatgpt_plan;
 pub mod chatgpt_plan_service;
 pub mod codex_account_proxy;
+pub mod codex_proxy_dotenv;
+pub mod codex_proxy_launch_guard;
 pub mod codex_proxy_probe;
 pub mod codex_proxy_engine;
 pub mod codex_proxy_engine_preflight;

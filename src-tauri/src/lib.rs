@@ -357,6 +357,7 @@ pub fn run() {
                 "[SingleInstance] 收到唤起请求: arg_count={}",
                 args.len()
             ));
+            if commands::codex_desktop_entry::handle(app, &args) { return; }
             let zcode_oauth_handled = handle_zcode_oauth_deep_links(&args);
             let handled = zcode_oauth_handled
                 || modules::external_import::handle_external_import_args(
@@ -701,7 +702,9 @@ pub fn run() {
                 modules::main_window_state::restore_to_window(&main);
             }
 
-            apply_startup_minimized(&app.handle());
+            if !commands::codex_desktop_entry::handle(&app.handle(), &startup_args) {
+                apply_startup_minimized(&app.handle());
+            }
             modules::workbuddy_auto_checkin::start_auto_checkin_scheduler(app.handle().clone());
             modules::trae_auto_checkin::start_trae_auto_checkin_scheduler(app.handle().clone());
             modules::minimax_code_auto_checkin::start_auto_checkin_scheduler(app.handle().clone());
@@ -1119,6 +1122,12 @@ pub fn run() {
             commands::codex::add_codex_account_from_grok,
             commands::codex::update_codex_account_name,
             commands::codex::update_codex_account_egress_proxy,
+            commands::codex::use_codex_client_proxy_defaults,
+            commands::codex_desktop_entry::configure_codex_desktop_entry,
+            commands::codex_desktop_entry::codex_desktop_entry_enabled,
+            commands::codex_desktop_entry::retry_codex_desktop_launch,
+            commands::codex_desktop_entry::codex_desktop_launch_failure,
+            commands::codex_desktop_entry::dismiss_codex_desktop_launch_failure,
             commands::codex::test_codex_account_egress_proxy,
             commands::codex::cancel_codex_account_egress_proxy,
             commands::codex::get_codex_account_proxy_status,

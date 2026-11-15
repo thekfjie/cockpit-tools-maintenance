@@ -5420,7 +5420,7 @@
         "viewAll": "查看全部"
       },
       "previewTitle": "代理預覽",
-      "modeDisabled": "不使用代理",
+      "modeDisabled": "强制直连",
       "disableAction": "解除代理",
       "setIndependent": "設定獨立代理",
       "disabledHint": "略過獨立與統一代理，新連線嘗試直連。",
@@ -5466,7 +5466,7 @@
       "restoreEntryNotRunning": "找不到仍在執行且使用目前 Cockpit 已記錄代理入口的桌面端。",
       "restoreEntryBusy": "代理正在恢復，請稍後重試。",
       "restoreEntryTimeout": "代理恢復逾時，請重試。",
-      "restartHint": "透過本機轉接啟動的用戶端，新連線會自動使用新出口；其他執行中的用戶端需重啟一次。桌面轉接僅監聽本機，但不隔離本機其他使用者；不變更系統代理。",
+      "restartHint": "首次绑定、切换代理模式或解绑后，重新启动 Codex 以同时应用界面和后台代理设置。代理连接失败时不会回退直连。",
       "exportHint": "帳號匯出不含代理憑證，匯入後需重新設定。",
       "backToAccounts": "返回帳號",
       "accountsTitle": "帳號",
@@ -5851,7 +5851,28 @@
       "noCurrentNode": "尚未取得目前節點",
       "runtimeBusy": "本機代理忙碌，暫時無法更新",
       "runtimeCapacity": "執行中的代理過多，請停止不使用的代理後重試",
-      "runtimeReadFailed": "暫時無法讀取本機代理狀態，請重試"
+      "runtimeReadFailed": "暫時無法讀取本機代理狀態，請重試",
+      "modeClient": "使用客户端原设置",
+      "clientHint": "保留此账号原有的 .env 和系统代理设置，不使用 Cockpit 的账号或统一代理。",
+      "desktop": {
+        "title": "桌面启动同步",
+        "enable": "启用桌面启动同步",
+        "enabled": "桌面启动同步：已启用",
+        "disable": "恢复原快捷方式",
+        "enableHint": "将桌面的 Codex 快捷方式接入当前账号的启动流程。以后点击它，会自动在后台启动 Cockpit，恢复代理并检查连接；成功后静默打开 Codex。原快捷方式会保存，关闭此功能时恢复。",
+        "disableHint": "恢复启用前的 Codex 快捷方式。恢复后直接启动 Codex 不再经过 Cockpit 的代理启动检查。",
+        "scopeHint": "此功能检查受管的 HTTP/TCP 代理配置与连接，不代表 UDP、语音或 WebRTC 已隔离。",
+        "blocked": "Codex 启动已暂停",
+        "blockedHint": "当前启动未通过检查。请检查账号代理设置后重试；重试会重新验证，不会绕过代理保护。",
+        "back": "返回面板",
+        "retry": "重新检查并启动",
+        "checkFailed": "指定代理的连接未通过检查，请确认代理内核与节点可用。",
+        "envChanged": "检测到代理配置被其他操作修改。原文件已保留，请检查 .env 中的代理设置后重试。",
+        "restartRequired": "当前 Codex 实例尚未使用完整的账号代理设置，已停止该实例。请确认后重新启动。",
+        "shortcutChanged": "快捷方式已被其他操作修改，已保留现有文件，请先检查桌面快捷方式。",
+        "stopFailed": "未能停止配置不匹配的 Codex 实例。请先退出该实例，再重试。",
+        "setupFailed": "未能配置桌面入口，原快捷方式保持保留，请重试。"
+      }
     },
     "more": {
       "title": "更多",

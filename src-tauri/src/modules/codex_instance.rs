@@ -71,13 +71,15 @@ pub async fn preflight_egress_proxy_for_bind_account(bind_account_id: Option<&st
         return Ok(());
     };
     if is_api_service_bind_account_id(bound) {
-        super::codex_client_proxy::resolve(bound).await?;
+        let proxy = super::codex_client_proxy::resolve(bound).await?;
+        super::codex_proxy_launch_guard::preflight(&proxy).await?;
         return Ok(());
     }
     let normalized = parse_provider_gateway_bind_account_id(bound).unwrap_or_else(|| bound.to_owned());
     let account = super::codex_proxy_runtime::load(&normalized).await?;
     if account.is_api_key_auth() {
-        super::codex_client_proxy::resolve(&normalized).await?;
+        let proxy = super::codex_client_proxy::resolve(&normalized).await?;
+        super::codex_proxy_launch_guard::preflight(&proxy).await?;
         return Ok(());
     }
     let account_id = parse_provider_gateway_bind_account_id(bound).unwrap_or_else(|| bound.to_owned());
@@ -87,7 +89,9 @@ pub async fn preflight_egress_proxy_for_bind_account(bind_account_id: Option<&st
     ).await?;
     // Prepare the local listener before stopping a working desktop or writing
     // credentials. This opens no upstream connection and does not test a model.
-    crate::modules::codex_proxy_desktop_router::ensure(&account_id).await?;
+    if let Some(url) = crate::modules::codex_proxy_desktop_router::ensure(&account_id).await? {
+        super::codex_proxy_launch_guard::preflight(&super::process::CodexLaunchProxy::Proxy(url)).await?;
+    }
     Ok(())
 }
 
@@ -112,6 +116,9 @@ pub async fn resolve_egress_proxy_for_bind_account(
         parse_provider_gateway_bind_account_id(bind_account_id).unwrap_or_else(|| bind_account_id.to_string());
     let account = crate::modules::codex_proxy_runtime::load(&account_id).await?;
     if account.is_api_key_auth() { return super::codex_client_proxy::resolve(&account_id).await; }
+    if crate::modules::codex_account_proxy::eligible(&account) && account.egress_proxy_client_defaults {
+        return Ok(CodexLaunchProxy::ClientDefaults);
+    }
     if crate::modules::codex_account_proxy::eligible(&account) && account.egress_proxy_disabled {
         return Ok(CodexLaunchProxy::Direct);
     }

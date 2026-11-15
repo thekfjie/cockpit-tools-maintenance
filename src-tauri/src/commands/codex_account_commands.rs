@@ -2330,6 +2330,25 @@ pub fn update_codex_account_name(account_id: String, name: String) -> Result<Cod
 }
 
 #[tauri::command]
+pub async fn use_codex_client_proxy_defaults(account_id: String) -> Result<CodexAccount, String> {
+    if let Some(target) = crate::modules::codex_proxy_targets::desktop_target(&account_id).await? {
+        crate::modules::codex_client_proxy::save(target.clone(), crate::modules::codex_client_proxy::Mode::ClientDefaults, None, None, None, std::collections::BTreeMap::new(), None).await?;
+        return Ok(crate::modules::codex_client_proxy::target_view(&target).await?.account);
+    }
+    let account = crate::modules::codex_proxy_runtime::save_client_defaults(account_id).await?;
+    let result = account.clone();
+    tauri::async_runtime::spawn_blocking(move || {
+        if crate::modules::codex_local_access::sync_sidecar_auth_file_for_account(&account).is_err() {
+            logger::log_warn("[CodexProxy] client-default setting saved; sidecar synchronization deferred");
+        }
+        if crate::modules::codex_local_access::collection_contains_account(&account.id) {
+            crate::modules::codex_local_access::trigger_gateway_reload_in_background("更新账号出口代理");
+        }
+    }).await.map_err(|_| "PROXY_SAVE_FAILED")?;
+    Ok(result)
+}
+
+#[tauri::command]
 pub async fn update_codex_account_egress_proxy(
     account_id: String,
     egress_proxy_url: Option<String>,

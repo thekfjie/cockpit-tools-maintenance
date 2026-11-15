@@ -5467,7 +5467,7 @@
         "viewAll": "عرض الكل"
       },
       "previewTitle": "معاينة الوكيل",
-      "modeDisabled": "بلا وكيل",
+      "modeDisabled": "Force direct",
       "disableAction": "إلغاء الوكيل",
       "setIndependent": "وكيل خاص",
       "disabledHint": "تجاوز الوكيل الخاص والمشترك ومحاولة الاتصال المباشر للاتصالات الجديدة.",
@@ -5513,7 +5513,7 @@
       "restoreEntryNotRunning": "لم يُعثر على تطبيق سطح مكتب يعمل ويستخدم مدخل وكيل مسجل تابع لنسخة Cockpit هذه.",
       "restoreEntryBusy": "استعادة الوكيل جارية بالفعل. أعد المحاولة بعد قليل.",
       "restoreEntryTimeout": "انتهت مهلة استعادة الوكيل. أعد المحاولة.",
-      "restartHint": "ينتقل العملاء الذين بدأوا عبر المُرحّل المحلي عند إنشاء اتصال جديد. يحتاج العملاء الآخرون إلى إعادة تشغيل مرة واحدة. يستمع جسر سطح المكتب على واجهة الاسترجاع المحلية فقط، لكنه لا يعزل المستخدمين المحليين الآخرين. لا تتغير إعدادات وكيل النظام.",
+      "restartHint": "Restart Codex after binding, changing proxy mode or unbinding so both the interface and backend use the new settings. A failed proxy connection never falls back to direct.",
       "exportHint": "لا تتضمن صادرات الحساب بيانات اعتماد الوكيل؛ أعد إعدادها بعد الاستيراد.",
       "backToAccounts": "العودة إلى الحسابات",
       "accountsTitle": "الحسابات",
@@ -5898,7 +5898,28 @@
       "noCurrentNode": "العقدة الحالية غير متاحة بعد",
       "runtimeBusy": "الوكيل المحلي مشغول. التحديث غير متاح مؤقتًا.",
       "runtimeCapacity": "هناك عدد كبير من الوكلاء قيد التشغيل. أوقف الوكلاء غير المستخدمة وأعد المحاولة.",
-      "runtimeReadFailed": "حالة الوكيل المحلي غير متاحة مؤقتًا. أعد المحاولة."
+      "runtimeReadFailed": "حالة الوكيل المحلي غير متاحة مؤقتًا. أعد المحاولة.",
+      "modeClient": "Use client settings",
+      "clientHint": "Preserve this account’s original .env and system proxy settings; do not apply a Cockpit account or shared proxy.",
+      "desktop": {
+        "title": "Desktop launch integration",
+        "enable": "Enable desktop launch integration",
+        "enabled": "Desktop launch integration: enabled",
+        "disable": "Restore original shortcut",
+        "enableHint": "Connect the desktop Codex shortcut to the current account launch flow. It starts Cockpit in the background, restores the proxy and checks connectivity before opening Codex. Turning this off restores the original shortcut.",
+        "disableHint": "Restore the original Codex shortcut. Direct desktop launches will no longer run Cockpit’s proxy startup checks.",
+        "scopeHint": "Checks managed HTTP/TCP proxy configuration and connectivity. This does not certify UDP, voice or WebRTC isolation.",
+        "blocked": "Codex launch paused",
+        "blockedHint": "Startup checks did not pass. Review the account proxy settings, then retry. Retrying checks the route again without bypassing the proxy.",
+        "back": "Back to panel",
+        "retry": "Check again and launch",
+        "checkFailed": "The selected proxy connection could not be verified. Check the proxy core and node.",
+        "envChanged": "Proxy configuration changed outside this operation. The file was preserved; review proxy settings in .env before retrying.",
+        "restartRequired": "The running Codex instance was not using the complete account proxy configuration and has been stopped. Confirm by launching again.",
+        "shortcutChanged": "The shortcut was changed by another operation. It was preserved; review the desktop shortcut first.",
+        "stopFailed": "Could not stop the Codex instance with mismatched settings. Exit it before retrying.",
+        "setupFailed": "Desktop integration could not be configured. The original shortcut was preserved; try again."
+      }
     },
     "more": {
       "title": "المزيد",

@@ -1011,6 +1011,7 @@ pub(crate) fn save_account_preserving_egress_proxy(
     let mut merged = account.clone();
     merged.egress_proxy_url = current.egress_proxy_url;
     merged.egress_proxy_disabled = current.egress_proxy_disabled;
+    merged.egress_proxy_client_defaults = current.egress_proxy_client_defaults;
     save_account_with_tombstone_guard(&merged)?;
     Ok(merged)
 }

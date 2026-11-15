@@ -5467,7 +5467,7 @@
         "viewAll": "Lihat semua"
       },
       "previewTitle": "Pratinjau proksi",
-      "modeDisabled": "Tanpa proksi",
+      "modeDisabled": "Force direct",
       "disableAction": "Lepas proksi",
       "setIndependent": "Proksi sendiri",
       "disabledHint": "Lewati proksi akun dan bersama; coba koneksi langsung untuk sambungan baru.",
@@ -5513,7 +5513,7 @@
       "restoreEntryNotRunning": "Tidak ditemukan desktop aktif yang memakai pintu masuk proksi tercatat milik Cockpit ini.",
       "restoreEntryBusy": "Pemulihan proksi sedang berlangsung. Coba lagi sebentar.",
       "restoreEntryTimeout": "Pemulihan proksi kehabisan waktu. Coba lagi.",
-      "restartHint": "Klien yang dibuka melalui penerus lokal beralih pada koneksi baru. Klien aktif lainnya perlu sekali dimulai ulang. Jembatan desktop hanya mendengarkan pada loopback, tetapi tidak mengisolasi pengguna lokal lain. Proksi sistem tidak berubah.",
+      "restartHint": "Restart Codex after binding, changing proxy mode or unbinding so both the interface and backend use the new settings. A failed proxy connection never falls back to direct.",
       "exportHint": "Ekspor akun tidak menyertakan kredensial proksi; atur kembali setelah mengimpor.",
       "backToAccounts": "Kembali ke akun",
       "accountsTitle": "Akun",
@@ -5898,7 +5898,28 @@
       "noCurrentNode": "Node saat ini belum tersedia",
       "runtimeBusy": "Proksi lokal sibuk. Pembaruan sementara tidak tersedia.",
       "runtimeCapacity": "Terlalu banyak proksi aktif. Hentikan yang tidak digunakan dan coba lagi.",
-      "runtimeReadFailed": "Status proksi lokal sementara tidak tersedia. Coba lagi."
+      "runtimeReadFailed": "Status proksi lokal sementara tidak tersedia. Coba lagi.",
+      "modeClient": "Use client settings",
+      "clientHint": "Preserve this account’s original .env and system proxy settings; do not apply a Cockpit account or shared proxy.",
+      "desktop": {
+        "title": "Desktop launch integration",
+        "enable": "Enable desktop launch integration",
+        "enabled": "Desktop launch integration: enabled",
+        "disable": "Restore original shortcut",
+        "enableHint": "Connect the desktop Codex shortcut to the current account launch flow. It starts Cockpit in the background, restores the proxy and checks connectivity before opening Codex. Turning this off restores the original shortcut.",
+        "disableHint": "Restore the original Codex shortcut. Direct desktop launches will no longer run Cockpit’s proxy startup checks.",
+        "scopeHint": "Checks managed HTTP/TCP proxy configuration and connectivity. This does not certify UDP, voice or WebRTC isolation.",
+        "blocked": "Codex launch paused",
+        "blockedHint": "Startup checks did not pass. Review the account proxy settings, then retry. Retrying checks the route again without bypassing the proxy.",
+        "back": "Back to panel",
+        "retry": "Check again and launch",
+        "checkFailed": "The selected proxy connection could not be verified. Check the proxy core and node.",
+        "envChanged": "Proxy configuration changed outside this operation. The file was preserved; review proxy settings in .env before retrying.",
+        "restartRequired": "The running Codex instance was not using the complete account proxy configuration and has been stopped. Confirm by launching again.",
+        "shortcutChanged": "The shortcut was changed by another operation. It was preserved; review the desktop shortcut first.",
+        "stopFailed": "Could not stop the Codex instance with mismatched settings. Exit it before retrying.",
+        "setupFailed": "Desktop integration could not be configured. The original shortcut was preserved; try again."
+      }
     },
     "more": {
       "title": "Lainnya",

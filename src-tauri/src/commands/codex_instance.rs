@@ -3101,6 +3101,9 @@ async fn codex_start_instance_internal(
         let launch_proxy = modules::codex_instance::resolve_egress_proxy_for_bind_account(
             default_bind_account_id.as_deref(),
         ).await?;
+        modules::codex_proxy_dotenv::apply(&default_dir, default_bind_account_id.as_deref().unwrap_or("__client__"), &launch_proxy)?;
+        modules::codex_proxy_launch_guard::preflight(&launch_proxy).await?;
+        modules::codex_proxy_launch_guard::verify_profile(&default_dir, default_bind_account_id.as_deref().unwrap_or("__client__"), &launch_proxy)?;
         launch_proxy.append_electron_args(&mut injection_plan.args);
         emit_codex_instance_launch_step(
             &app,
@@ -3122,6 +3125,7 @@ async fn codex_start_instance_internal(
         );
         let launch_args = injection_plan.args.clone();
         let prepared_home = default_dir.clone();
+        let verify_proxy = launch_proxy.clone();
         // Package registration, activation and PID confirmation can wait on
         // Windows services. Keep that synchronous work off the async runtime.
         let pid = tauri::async_runtime::spawn_blocking(move || {
@@ -3134,6 +3138,7 @@ async fn codex_start_instance_internal(
         })
         .await
         .map_err(|error| format!("Codex launch worker failed: {error}"))??;
+        modules::codex_proxy_launch_guard::verify_or_stop(&default_dir, default_bind_account_id.as_deref().unwrap_or("__client__"), pid, &verify_proxy)?;
         if codex_instance_start_cancelled(&instance_id) {
             let _ = modules::process::close_pid(pid, 5);
             return Err("CODEX_START_CANCELLED".to_string());
@@ -3415,6 +3420,9 @@ async fn codex_start_instance_internal(
     let launch_proxy = modules::codex_instance::resolve_egress_proxy_for_bind_account(
         instance.bind_account_id.as_deref(),
     ).await?;
+    modules::codex_proxy_dotenv::apply(instance_dir, instance.bind_account_id.as_deref().unwrap_or("__client__"), &launch_proxy)?;
+    modules::codex_proxy_launch_guard::preflight(&launch_proxy).await?;
+    modules::codex_proxy_launch_guard::verify_profile(instance_dir, instance.bind_account_id.as_deref().unwrap_or("__client__"), &launch_proxy)?;
     launch_proxy.append_electron_args(&mut injection_plan.args);
     emit_codex_instance_launch_step(
         &app,
@@ -3435,6 +3443,7 @@ async fn codex_start_instance_internal(
         instance.bind_account_id.clone(),
     );
     let launch_home = instance.user_data_dir.clone();
+    let verify_proxy = launch_proxy.clone();
     let launch_args = injection_plan.args.clone();
     let pid = tauri::async_runtime::spawn_blocking(move || {
         modules::process::start_codex_with_args_and_env_and_egress(
@@ -3446,6 +3455,7 @@ async fn codex_start_instance_internal(
     })
     .await
     .map_err(|error| format!("Codex launch worker failed: {error}"))??;
+    modules::codex_proxy_launch_guard::verify_or_stop(instance_dir, instance.bind_account_id.as_deref().unwrap_or("__client__"), pid, &verify_proxy)?;
     if codex_instance_start_cancelled(&instance_id) {
         let _ = modules::process::close_pid(pid, 5);
         return Err("CODEX_START_CANCELLED".to_string());

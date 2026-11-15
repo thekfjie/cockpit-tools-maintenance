@@ -3,12 +3,14 @@
 pub enum CodexLaunchProxy {
     Inherit,
     Direct,
+    ClientDefaults,
     Proxy(String),
 }
 
 impl CodexLaunchProxy {
     pub fn append_electron_args(&self, args: &mut Vec<String>) {
         match self {
+            Self::ClientDefaults => (),
             Self::Inherit => append_global_electron_proxy_args(args),
             Self::Direct => {
                 clear_electron_proxy_args(args);
@@ -18,11 +20,28 @@ impl CodexLaunchProxy {
         }
     }
 
+    pub(crate) fn dotenv_overrides(&self) -> Result<Vec<(&'static str, String)>, String> {
+        if let Self::Proxy(raw) = self {
+            let parsed = url::Url::parse(raw).map_err(|_| "PROXY_ENV_STORAGE")?;
+            if !matches!(parsed.host_str(), Some("127.0.0.1") | Some("[::1]") | Some("::1"))
+                || !parsed.username().is_empty() || parsed.password().is_some()
+                || parsed.port().is_none() || !matches!(parsed.scheme(), "socks5" | "socks5h" | "http") {
+                return Err("PROXY_ENV_STORAGE".into());
+            }
+        }
+        if matches!(self, Self::Inherit | Self::ClientDefaults) { return Ok(Vec::new()); }
+        Ok(self.env_overrides())
+    }
+
     // Explicit empty overrides also work across LaunchServices and the Windows
     // package helper, whose child can inherit an environment different from ours.
     fn env_overrides(&self) -> Vec<(&'static str, String)> {
         match self {
             Self::Inherit => Vec::new(),
+            // Package activation merges Cockpit defaults first. Override them
+            // with the original parent environment; .env is restored separately.
+            Self::ClientDefaults => ["http_proxy", "https_proxy", "all_proxy", "HTTP_PROXY", "HTTPS_PROXY", "ALL_PROXY", "no_proxy", "NO_PROXY"]
+                .into_iter().map(|key| (key, std::env::var(key).unwrap_or_default())).collect(),
             Self::Proxy(url) => account_proxy_env_pairs(url),
             Self::Direct => [
                 ("http_proxy", ""),

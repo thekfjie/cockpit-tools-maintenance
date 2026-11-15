@@ -9,6 +9,7 @@ pub mod codebuddy_cn_instance;
 pub mod codebuddy_instance;
 pub mod codebuddy_session;
 pub mod codex;
+pub mod codex_desktop_entry;
 pub mod chatgpt_plan;
 pub mod chatgpt_plan_service;
 pub mod codex_proxy_engine;

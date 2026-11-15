@@ -5420,7 +5420,7 @@
         "viewAll": "Показать все"
       },
       "previewTitle": "Обзор прокси",
-      "modeDisabled": "Без прокси",
+      "modeDisabled": "Force direct",
       "disableAction": "Отключить прокси",
       "setIndependent": "Свой прокси",
       "disabledHint": "Не использовать личный и общий прокси; новые соединения устанавливать напрямую.",
@@ -5466,7 +5466,7 @@
       "restoreEntryNotRunning": "Не найдено работающих приложений, использующих сохранённый вход прокси этого экземпляра Cockpit.",
       "restoreEntryBusy": "Восстановление прокси уже выполняется. Повторите попытку чуть позже.",
       "restoreEntryTimeout": "Время восстановления прокси истекло. Повторите попытку.",
-      "restartHint": "Клиенты, запущенные через локальный посредник, переключат новые соединения. Остальным запущенным клиентам нужна одна перезагрузка. Мост клиента слушает только петлевой интерфейс, но не изолирует других локальных пользователей. Системный прокси не меняется.",
+      "restartHint": "Restart Codex after binding, changing proxy mode or unbinding so both the interface and backend use the new settings. A failed proxy connection never falls back to direct.",
       "exportHint": "Экспорт аккаунтов не включает учётные данные прокси; настройте их заново после импорта.",
       "backToAccounts": "Назад к аккаунтам",
       "accountsTitle": "Аккаунты",
@@ -5851,7 +5851,28 @@
       "noCurrentNode": "Текущий узел пока недоступен",
       "runtimeBusy": "Локальный прокси занят. Обновление временно недоступно.",
       "runtimeCapacity": "Запущено слишком много прокси. Остановите неиспользуемые и повторите попытку.",
-      "runtimeReadFailed": "Состояние локального прокси временно недоступно. Повторите попытку."
+      "runtimeReadFailed": "Состояние локального прокси временно недоступно. Повторите попытку.",
+      "modeClient": "Use client settings",
+      "clientHint": "Preserve this account’s original .env and system proxy settings; do not apply a Cockpit account or shared proxy.",
+      "desktop": {
+        "title": "Desktop launch integration",
+        "enable": "Enable desktop launch integration",
+        "enabled": "Desktop launch integration: enabled",
+        "disable": "Restore original shortcut",
+        "enableHint": "Connect the desktop Codex shortcut to the current account launch flow. It starts Cockpit in the background, restores the proxy and checks connectivity before opening Codex. Turning this off restores the original shortcut.",
+        "disableHint": "Restore the original Codex shortcut. Direct desktop launches will no longer run Cockpit’s proxy startup checks.",
+        "scopeHint": "Checks managed HTTP/TCP proxy configuration and connectivity. This does not certify UDP, voice or WebRTC isolation.",
+        "blocked": "Codex launch paused",
+        "blockedHint": "Startup checks did not pass. Review the account proxy settings, then retry. Retrying checks the route again without bypassing the proxy.",
+        "back": "Back to panel",
+        "retry": "Check again and launch",
+        "checkFailed": "The selected proxy connection could not be verified. Check the proxy core and node.",
+        "envChanged": "Proxy configuration changed outside this operation. The file was preserved; review proxy settings in .env before retrying.",
+        "restartRequired": "The running Codex instance was not using the complete account proxy configuration and has been stopped. Confirm by launching again.",
+        "shortcutChanged": "The shortcut was changed by another operation. It was preserved; review the desktop shortcut first.",
+        "stopFailed": "Could not stop the Codex instance with mismatched settings. Exit it before retrying.",
+        "setupFailed": "Desktop integration could not be configured. The original shortcut was preserved; try again."
+      }
     },
     "more": {
       "title": "Ещё",
