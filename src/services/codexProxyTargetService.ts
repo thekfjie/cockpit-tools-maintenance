@@ -1,4 +1,3 @@
-import { invoke } from '@tauri-apps/api/core';
 import { useCodexAccountStore } from '../stores/useCodexAccountStore';
 import { updateCodexAccountEgressProxy } from './codexService';
 import { invoke } from '@tauri-apps/api/core';

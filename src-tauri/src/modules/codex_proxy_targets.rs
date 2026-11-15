@@ -105,7 +105,7 @@ pub async fn account_totals() -> Result<(Vec<String>, Vec<String>, Vec<String>),
             special.push(account.id);
             continue;
         }
-        if !super::codex_account_proxy::eligible(&account) {
+        if !super::codex_account_proxy::eligible(&account) || account.egress_proxy_client_defaults {
             continue;
         }
         if account.egress_proxy_disabled {
@@ -124,7 +124,8 @@ pub async fn account_totals() -> Result<(Vec<String>, Vec<String>, Vec<String>),
         match modes.get(&id).copied().unwrap_or_default() {
             desktop::Mode::Direct => disabled.push(id.clone()),
             desktop::Mode::Independent | desktop::Mode::BoundOauth => independent.push(id.clone()),
-            desktop::Mode::Inherit | desktop::Mode::ClientDefaults => (),
+            desktop::Mode::ClientDefaults => continue,
+            desktop::Mode::Inherit => (),
         }
         eligible.push(id);
     }
