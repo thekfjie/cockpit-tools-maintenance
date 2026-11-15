@@ -61,16 +61,28 @@ try {
         'codex_proxy_dotenv', 'codex_proxy_launch_guard', 'codex_account_proxy',
         'codex_client_proxy::tests', 'codex_desktop_entry::tests', 'codex_proxy_desktop_router::tests', 'codex_direct_launch_tests',
         'quota_proxy_persistence')
+    $failedFilters = @()
     foreach ($filter in $filters) {
         $listed = & $testExe $filter --list
-        if ($LASTEXITCODE -ne 0) { throw "Listing Rust regressions failed: $filter" }
-        if (@($listed | Where-Object { $_ -match ': test$' }).Count -eq 0) {
-            throw "No Rust regressions matched filter: $filter"
+        if ($LASTEXITCODE -ne 0) {
+            $failedFilters += $filter
+            Write-Warning "Listing Rust regressions failed: $filter"
+            continue
         }
+        if (@($listed | Where-Object { $_ -match ': test$' }).Count -eq 0) {
+            $failedFilters += $filter
+            Write-Warning "No Rust regressions matched filter: $filter"
+            continue
+        }
+        $logName = $filter -replace '[^A-Za-z0-9_-]', '_'
         & $testExe $filter --test-threads=1 --nocapture 2>&1 |
-            Tee-Object -FilePath "$filter-tests.log"
-        if ($LASTEXITCODE -ne 0) { throw "Rust regressions failed: $filter ($LASTEXITCODE)" }
+            Tee-Object -FilePath "$logName-tests.log"
+        if ($LASTEXITCODE -ne 0) {
+            $failedFilters += $filter
+            Write-Warning "Rust regressions failed: $filter ($LASTEXITCODE)"
+        }
     }
+    if ($failedFilters.Count -gt 0) { throw "Rust regressions failed: $($failedFilters -join ', ')" }
 } finally {
     foreach ($path in @($manifestPath, $extractedPath)) {
         if (Test-Path -LiteralPath $path) { Remove-Item -LiteralPath $path -Force }
