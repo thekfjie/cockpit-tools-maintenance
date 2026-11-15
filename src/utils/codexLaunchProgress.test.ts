@@ -85,9 +85,14 @@ test('rejects switch events without a target account', () => {
 });
 
 test('account proxy startup checks are retryable setup failures', () => {
-  assert.equal(codexLaunchErrorKey('PROXY_LAUNCH_CHECK_FAILED'), 'codex.proxy.desktop.checkFailed');
-  assert.equal(codexLaunchErrorKey('PROXY_ENV_CHANGED'), 'codex.proxy.desktop.envChanged');
-  assert.equal(codexLaunchErrorKey('PROXY_ENV_STORAGE'), 'codex.proxy.desktop.envStorage');
-  assert.equal(codexLaunchErrorKey('PROXY_ENV_UNSUPPORTED'), 'codex.proxy.desktop.envUnsupported');
-  assert.equal(codexLaunchErrorKey('PROXY_LAUNCH_STOP_FAILED'), 'codex.proxy.desktop.stopFailed');
+  assert.equal(codexLaunchErrorKey('PROXY_ENV_CHANGED'), 'codex.proxy.launch.envChanged');
+  assert.equal(codexLaunchErrorKey('PROXY_ENV_STORAGE'), 'codex.proxy.launch.envStorage');
+  assert.equal(codexLaunchErrorKey('PROXY_ENV_UNSUPPORTED'), 'codex.proxy.launch.envUnsupported');
+  assert.equal(codexLaunchErrorKey('PROXY_LAUNCH_STOP_FAILED'), 'codex.proxy.launch.stopFailed');
+});
+
+test('country checks warn without being classified as authorization failures', () => {
+  assert.equal(codexLaunchErrorKey('PROXY_COUNTRY_MISMATCH:JP:SG'), 'codex.proxy.country.mismatch');
+  assert.equal(codexLaunchErrorKey('PROXY_COUNTRY_UNAVAILABLE'), 'codex.proxy.country.unavailable');
+  assert.equal(codexLaunchErrorKey('PROXY_COUNTRY_ROUTE_UNKNOWN'), 'codex.proxy.country.routeUnknown');
 });

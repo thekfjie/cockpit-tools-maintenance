@@ -71,15 +71,13 @@ pub async fn preflight_egress_proxy_for_bind_account(bind_account_id: Option<&st
         return Ok(());
     };
     if is_api_service_bind_account_id(bound) {
-        let proxy = super::codex_client_proxy::resolve(bound).await?;
-        super::codex_proxy_launch_guard::preflight(&proxy).await?;
+        super::codex_client_proxy::resolve(bound).await?;
         return Ok(());
     }
     let normalized = parse_provider_gateway_bind_account_id(bound).unwrap_or_else(|| bound.to_owned());
     let account = super::codex_proxy_runtime::load(&normalized).await?;
     if account.is_api_key_auth() {
-        let proxy = super::codex_client_proxy::resolve(&normalized).await?;
-        super::codex_proxy_launch_guard::preflight(&proxy).await?;
+        super::codex_client_proxy::resolve(&normalized).await?;
         return Ok(());
     }
     let account_id = parse_provider_gateway_bind_account_id(bound).unwrap_or_else(|| bound.to_owned());
@@ -89,9 +87,7 @@ pub async fn preflight_egress_proxy_for_bind_account(bind_account_id: Option<&st
     ).await?;
     // Prepare the local listener before stopping a working desktop or writing
     // credentials. This opens no upstream connection and does not test a model.
-    if let Some(url) = crate::modules::codex_proxy_desktop_router::ensure(&account_id).await? {
-        super::codex_proxy_launch_guard::preflight(&super::process::CodexLaunchProxy::Proxy(url)).await?;
-    }
+    crate::modules::codex_proxy_desktop_router::ensure(&account_id).await?;
     Ok(())
 }
 

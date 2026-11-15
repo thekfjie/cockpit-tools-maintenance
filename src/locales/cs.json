@@ -5854,26 +5854,25 @@
       "runtimeReadFailed": "Stav místní proxy je dočasně nedostupný. Zkuste to znovu.",
       "modeClient": "Použít nastavení klienta",
       "clientHint": "Zachovat původní nastavení .env a systémové proxy tohoto účtu; nepoužívat proxy účtu ani sdílenou proxy Cockpitu.",
-      "desktop": {
-        "title": "Integrace spuštění z plochy",
-        "enable": "Zapnout integraci spuštění z plochy",
-        "enabled": "Integrace spuštění z plochy: zapnuta",
-        "disable": "Obnovit původního zástupce",
-        "enableHint": "Propojí zástupce Codexu na ploše se spuštěním aktuálního účtu. Cockpit se spustí na pozadí, obnoví proxy a před otevřením Codexu ověří připojení. Vypnutí obnoví původního zástupce.",
-        "disableHint": "Obnoví původního zástupce Codexu. Přímé spuštění z plochy už nebude provádět kontroly proxy Cockpitu.",
-        "scopeHint": "Ověřuje nastavení a připojení spravované HTTP/TCP proxy. Nepotvrzuje izolaci UDP, hlasu ani WebRTC.",
-        "blocked": "Spuštění Codexu pozastaveno",
-        "blockedHint": "Kontroly spuštění neprošly. Zkontrolujte proxy účtu a zkuste to znovu. Trasa se znovu ověří bez obejití proxy.",
-        "back": "Zpět na panel",
-        "retry": "Znovu ověřit a spustit",
-        "checkFailed": "Připojení vybrané proxy nelze ověřit. Zkontrolujte jádro proxy a uzel.",
+      "launch": {
         "envChanged": "Nastavení proxy bylo změněno mimo tuto operaci. Soubor byl zachován; před dalším pokusem zkontrolujte proxy v .env.",
-        "restartRequired": "Běžící instance Codexu nepoužívala úplné nastavení proxy účtu a byla zastavena. Potvrďte novým spuštěním.",
-        "shortcutChanged": "Zástupce změnila jiná operace. Byl zachován; nejprve zkontrolujte zástupce na ploše.",
-        "stopFailed": "Instanci Codexu s odlišným nastavením nelze zastavit. Před dalším pokusem ji ukončete.",
-        "setupFailed": "Integraci plochy nelze nastavit. Původní zástupce byl zachován; zkuste to znovu.",
         "envStorage": "Nastavení proxy nelze bezpečně přečíst nebo uložit. Původní soubor byl zachován; zkontrolujte oprávnění složky.",
-        "envUnsupported": "Formát .env nelze bezpečně spravovat a nebyl přepsán. Zkontrolujte neuzavřené uvozovky a pokračování řádků."
+        "envUnsupported": "Formát .env nelze bezpečně spravovat a nebyl přepsán. Zkontrolujte neuzavřené uvozovky a pokračování řádků.",
+        "stopFailed": "Instanci Codexu s odlišným nastavením nelze zastavit. Před dalším pokusem ji ukončete."
+      },
+      "country": {
+        "title": "Před spuštěním ověřit zemi výstupu",
+        "hint": "Volitelné pro všechny účty, s přiřazenou proxy i bez ní. Při spuštění z Cockpitu ověří aktuální HTTP výstup přes ChatGPT Cloudflare trace. Zástupce na ploše nemění.",
+        "expected": "Očekávaná země nebo oblast",
+        "choose": "Vyberte zemi nebo oblast",
+        "save": "Uložit kontrolu země",
+        "saved": "Nastavení kontroly země uloženo",
+        "mismatch": "Země výstupu se liší: očekáváno {{expected}}, zjištěno {{actual}}. Codex nebyl spuštěn.",
+        "unavailable": "Zemi výstupu nelze potvrdit. Codex nebyl spuštěn; ověřte připojení a zkuste to znovu.",
+        "routeUnknown": "Nelze určit proxy trasu klienta. Codex nebyl spuštěn; ověřte proxy klienta a .env.",
+        "changed": "Nastavení země se během ověřování změnilo. Opakujte kontrolu s aktuálním nastavením.",
+        "storage": "Nastavení kontroly země nelze přečíst nebo uložit.",
+        "invalid": "Vyberte platnou zemi nebo oblast."
       }
     },
     "more": {

@@ -5854,26 +5854,25 @@
       "runtimeReadFailed": "Stan lokalnego serwera proxy jest chwilowo niedostępny. Spróbuj ponownie.",
       "modeClient": "Użyj ustawień klienta",
       "clientHint": "Zachowaj pierwotne ustawienia .env i systemowego proxy tego konta; nie stosuj proxy konta ani współdzielonego proxy Cockpit.",
-      "desktop": {
-        "title": "Integracja uruchamiania z pulpitu",
-        "enable": "Włącz integrację uruchamiania z pulpitu",
-        "enabled": "Integracja uruchamiania z pulpitu: włączona",
-        "disable": "Przywróć oryginalny skrót",
-        "enableHint": "Łączy skrót Codex z uruchamianiem bieżącego konta. Cockpit uruchamia się w tle, przywraca proxy i sprawdza połączenie przed otwarciem Codex. Wyłączenie przywraca oryginalny skrót.",
-        "disableHint": "Przywraca oryginalny skrót Codex. Bezpośrednie uruchamianie z pulpitu nie będzie sprawdzać proxy przez Cockpit.",
-        "scopeHint": "Sprawdza konfigurację i połączenie zarządzanego proxy HTTP/TCP. Nie potwierdza izolacji UDP, głosu ani WebRTC.",
-        "blocked": "Uruchamianie Codex wstrzymane",
-        "blockedHint": "Kontrole uruchamiania nie powiodły się. Sprawdź proxy konta i ponów próbę. Trasa zostanie sprawdzona ponownie bez omijania proxy.",
-        "back": "Wróć do panelu",
-        "retry": "Sprawdź ponownie i uruchom",
-        "checkFailed": "Nie można zweryfikować połączenia wybranego proxy. Sprawdź silnik proxy i węzeł.",
+      "launch": {
         "envChanged": "Konfiguracja proxy zmieniła się poza tą operacją. Plik zachowano; przed ponowną próbą sprawdź proxy w .env.",
-        "restartRequired": "Uruchomiona instancja Codex nie używała pełnej konfiguracji proxy konta i została zatrzymana. Potwierdź, uruchamiając ją ponownie.",
-        "shortcutChanged": "Inna operacja zmieniła skrót. Został zachowany; najpierw sprawdź skrót na pulpicie.",
-        "stopFailed": "Nie można zatrzymać instancji Codex z niezgodnymi ustawieniami. Zamknij ją przed ponowną próbą.",
-        "setupFailed": "Nie można skonfigurować integracji pulpitu. Oryginalny skrót zachowano; spróbuj ponownie.",
         "envStorage": "Nie można bezpiecznie odczytać lub zapisać konfiguracji proxy. Oryginalny plik zachowano; sprawdź uprawnienia folderu.",
-        "envUnsupported": "Nie można bezpiecznie obsłużyć formatu .env i plik nie został nadpisany. Sprawdź niedomknięte cudzysłowy i kontynuacje wierszy."
+        "envUnsupported": "Nie można bezpiecznie obsłużyć formatu .env i plik nie został nadpisany. Sprawdź niedomknięte cudzysłowy i kontynuacje wierszy.",
+        "stopFailed": "Nie można zatrzymać instancji Codex z niezgodnymi ustawieniami. Zamknij ją przed ponowną próbą."
+      },
+      "country": {
+        "title": "Sprawdź kraj wyjścia przed uruchomieniem",
+        "hint": "Opcjonalne dla wszystkich kont, z przypisanym proxy lub bez. Sprawdza wyjście HTTP przez ChatGPT Cloudflare trace podczas uruchamiania z Cockpit. Skróty na pulpicie pozostają bez zmian.",
+        "expected": "Oczekiwany kraj lub region",
+        "choose": "Wybierz kraj lub region",
+        "save": "Zapisz kontrolę kraju",
+        "saved": "Zapisano ustawienia kontroli kraju",
+        "mismatch": "Kraj wyjścia jest inny: oczekiwano {{expected}}, wykryto {{actual}}. Codex nie został uruchomiony.",
+        "unavailable": "Nie można potwierdzić kraju wyjścia. Codex nie został uruchomiony; sprawdź połączenie i ponów próbę.",
+        "routeUnknown": "Nie można określić trasy proxy klienta. Codex nie został uruchomiony; sprawdź proxy klienta i .env.",
+        "changed": "Ustawienia kraju zmieniły się podczas sprawdzania. Ponów sprawdzanie bieżących ustawień.",
+        "storage": "Nie można odczytać lub zapisać ustawień kontroli kraju.",
+        "invalid": "Wybierz prawidłowy kraj lub region."
       }
     },
     "more": {

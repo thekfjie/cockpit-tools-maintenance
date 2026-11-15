@@ -230,3 +230,38 @@ pub fn verify(home: &Path, account: &str, proxy: &CodexLaunchProxy) -> Result<()
     if current != expected { return Err(CONFLICT.into()); }
     Ok(())
 }
+
+/// Resolve the proxy assignments the existing launch transaction will apply,
+/// without changing the profile or recovery journal.
+pub(crate) fn preview_proxy_variables(home: &Path, account: &str, proxy: &CodexLaunchProxy)
+    -> Result<BTreeMap<String, String>, String> {
+    let _write = WRITES.lock().map_err(|_| ERROR)?;
+    let mut state = if home.exists() { read_state(&state_path(home)?)? } else { State::default() };
+    let mut current = read_document(&home.join(".env"))?;
+    if let Some(pending) = state.pending.take() {
+        if current != pending.before && current != pending.after { return Err(CONFLICT.into()); }
+        current = pending.after;
+    }
+    let (_, projected) = transition(state, current, account, proxy)?;
+    let mut variables = BTreeMap::new();
+    for (part, is_proxy) in parts(projected.as_deref().unwrap_or(""))? {
+        if !is_proxy { continue; }
+        let name = key(part).ok_or(ERROR)?.to_ascii_lowercase();
+        let (_, raw) = part.split_once('=').ok_or(ERROR)?;
+        let raw = raw.trim();
+        let value = if raw.starts_with(['\'', '"']) {
+            let q = raw.chars().next().ok_or(ERROR)?;
+            let end = raw[1..].find(q).ok_or("PROXY_COUNTRY_ROUTE_UNKNOWN")? + 1;
+            let tail = raw[end+1..].trim();
+            if !tail.is_empty() && !tail.starts_with('#') { return Err("PROXY_COUNTRY_ROUTE_UNKNOWN".into()); }
+            raw[1..end].to_owned()
+        } else {
+            raw.split_once(" #").map_or(raw, |(v, _)| v).trim().to_owned()
+        };
+        // Do not guess interpolation or escape semantics. Never check a different
+        // route from the client just because parsing a custom .env is difficult.
+        if value.contains(['$', '\\', '\n', '\r']) { return Err("PROXY_COUNTRY_ROUTE_UNKNOWN".into()); }
+        variables.insert(name, value);
+    }
+    Ok(variables)
+}

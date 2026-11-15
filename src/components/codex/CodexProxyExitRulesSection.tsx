@@ -8,7 +8,6 @@ import {
   codexProxyExitModeKey, resolveExitMode, unifiedFollowingIds,
 } from '../../utils/codexProxyDraft';
 import type { CodexUnifiedProxyView } from '../../services/codexUnifiedProxyService';
-import { CodexDesktopProxyEntryButton } from './CodexDesktopProxyEntry';
 import { CodexUnifiedProxyPanel } from './CodexUnifiedProxyPanel';
 import { useCodexProxyAccountName } from './useCodexProxyExitEditor';
 import { useCodexProxyWorkspace } from './CodexProxyWorkspaceContext';
@@ -46,7 +45,6 @@ export function CodexProxyExitRulesSection() {
   return <section className="codex-proxy-rules" aria-label={t('codex.proxy.rules.title')}>
     <header className="codex-proxy-rules-head">
       <p>{t('codex.proxy.rules.intro')}</p>
-      <CodexDesktopProxyEntryButton />
     </header>
     <div className="codex-proxy-rules-order" role="note" aria-label={t('codex.proxy.rules.order')}>
       <span className="codex-proxy-rules-order-label">{t('codex.proxy.rules.order')}</span>

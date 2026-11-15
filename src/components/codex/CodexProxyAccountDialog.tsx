@@ -17,6 +17,7 @@ import { useEscCloseTopmost } from '../../hooks/useEscClose';
 import { useModalScrollLock } from '../../hooks/useModalScrollLock';
 import { useModalFocusTrap } from '../../hooks/useModalFocusTrap';
 import { CodexProxyPicker } from './CodexProxyPicker';
+import { CodexProxyCountryGuard } from './CodexProxyCountryGuard';
 import { CodexProxyRecentRequests } from './CodexProxyRecentRequests';
 import { CodexProxyRuntimeStatusPanel, useCodexProxyRuntimeStatus } from './CodexProxyRuntimeStatus';
 import { CodexProxyActivityPanel } from './CodexProxyActivityPanel';
@@ -130,6 +131,7 @@ export function CodexProxyAccountDialog({ accountId, initialTab, initialMode, on
             </div>
           </div>}
           <p className="codex-proxy-page-note">{t('codex.proxy.restartHint')}</p>
+          <CodexProxyCountryGuard key={accountId} accountId={accountId} disabled={measuring || !targetReady} />
         </> : <div className="codex-proxy-account-details">
           <CodexProxyRuntimeStatusPanel accountId={accountId} revision={editor.savedBinding} desktopOnly={accountId === CODEX_API_SERVICE_PROXY_TARGET} />
           <div className="codex-proxy-account-check-actions">

@@ -5901,26 +5901,25 @@
       "runtimeReadFailed": "Status proksi lokal sementara tidak tersedia. Coba lagi.",
       "modeClient": "Gunakan pengaturan klien",
       "clientHint": "Pertahankan pengaturan .env dan proxy sistem asli akun ini; jangan terapkan proxy akun atau proxy bersama Cockpit.",
-      "desktop": {
-        "title": "Integrasi peluncuran desktop",
-        "enable": "Aktifkan integrasi peluncuran desktop",
-        "enabled": "Integrasi peluncuran desktop: aktif",
-        "disable": "Pulihkan pintasan asli",
-        "enableHint": "Hubungkan pintasan Codex dengan peluncuran akun saat ini. Cockpit dimulai di latar belakang, memulihkan proxy dan memeriksa koneksi sebelum membuka Codex. Menonaktifkannya akan memulihkan pintasan asli.",
-        "disableHint": "Pulihkan pintasan Codex asli. Peluncuran langsung dari desktop tidak lagi menjalankan pemeriksaan proxy Cockpit.",
-        "scopeHint": "Memeriksa konfigurasi dan koneksi proxy HTTP/TCP terkelola. Ini tidak menjamin isolasi UDP, suara, atau WebRTC.",
-        "blocked": "Peluncuran Codex dijeda",
-        "blockedHint": "Pemeriksaan awal gagal. Tinjau proxy akun lalu coba lagi. Rute diperiksa ulang tanpa melewati proxy.",
-        "back": "Kembali ke panel",
-        "retry": "Periksa ulang dan luncurkan",
-        "checkFailed": "Koneksi proxy yang dipilih tidak dapat diverifikasi. Periksa inti proxy dan node.",
+      "launch": {
         "envChanged": "Konfigurasi proxy berubah di luar operasi ini. Berkas dipertahankan; tinjau proxy dalam .env sebelum mencoba lagi.",
-        "restartRequired": "Instans Codex tidak memakai seluruh konfigurasi proxy akun dan telah dihentikan. Konfirmasikan dengan meluncurkan lagi.",
-        "shortcutChanged": "Pintasan diubah operasi lain dan dipertahankan. Tinjau pintasan desktop terlebih dahulu.",
-        "stopFailed": "Instans Codex dengan pengaturan berbeda tidak dapat dihentikan. Tutup sebelum mencoba lagi.",
-        "setupFailed": "Integrasi desktop tidak dapat dikonfigurasi. Pintasan asli dipertahankan; coba lagi.",
         "envStorage": "Konfigurasi proxy tidak dapat dibaca atau disimpan dengan aman. Berkas asli dipertahankan; periksa izin folder.",
-        "envUnsupported": "Format .env tidak dapat dikelola dengan aman dan tidak ditimpa. Periksa tanda kutip yang belum ditutup atau kelanjutan baris."
+        "envUnsupported": "Format .env tidak dapat dikelola dengan aman dan tidak ditimpa. Periksa tanda kutip yang belum ditutup atau kelanjutan baris.",
+        "stopFailed": "Instans Codex dengan pengaturan berbeda tidak dapat dihentikan. Tutup sebelum mencoba lagi."
+      },
+      "country": {
+        "title": "Periksa negara keluar sebelum peluncuran",
+        "hint": "Opsional untuk semua akun, dengan atau tanpa proxy terikat. Memeriksa keluaran HTTP melalui ChatGPT Cloudflare trace saat diluncurkan dari Cockpit. Pintasan desktop tidak diubah.",
+        "expected": "Negara atau wilayah yang diharapkan",
+        "choose": "Pilih negara atau wilayah",
+        "save": "Simpan pemeriksaan negara",
+        "saved": "Pengaturan pemeriksaan negara disimpan",
+        "mismatch": "Negara keluar tidak cocok: diharapkan {{expected}}, terdeteksi {{actual}}. Codex tidak diluncurkan.",
+        "unavailable": "Negara keluar tidak dapat dikonfirmasi. Codex tidak diluncurkan; periksa koneksi dan coba lagi.",
+        "routeUnknown": "Rute proxy klien tidak dapat ditentukan. Codex tidak diluncurkan; tinjau proxy klien dan .env.",
+        "changed": "Pengaturan negara berubah selama pemeriksaan. Coba lagi untuk memeriksa pengaturan terbaru.",
+        "storage": "Pengaturan pemeriksaan negara tidak dapat dibaca atau disimpan.",
+        "invalid": "Pilih negara atau wilayah yang valid."
       }
     },
     "more": {

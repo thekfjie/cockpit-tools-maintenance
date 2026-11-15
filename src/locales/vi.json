@@ -5854,26 +5854,25 @@
       "runtimeReadFailed": "Tạm thời không thể đọc trạng thái proxy cục bộ. Vui lòng thử lại.",
       "modeClient": "Dùng thiết lập của ứng dụng khách",
       "clientHint": "Giữ thiết lập .env và proxy hệ thống ban đầu của tài khoản; không áp dụng proxy tài khoản hoặc proxy chung của Cockpit.",
-      "desktop": {
-        "title": "Tích hợp khởi chạy từ màn hình nền",
-        "enable": "Bật tích hợp khởi chạy từ màn hình nền",
-        "enabled": "Tích hợp khởi chạy từ màn hình nền: đã bật",
-        "disable": "Khôi phục lối tắt ban đầu",
-        "enableHint": "Liên kết lối tắt Codex với luồng khởi chạy tài khoản hiện tại. Cockpit chạy nền, khôi phục proxy và kiểm tra kết nối trước khi mở Codex. Tắt tính năng sẽ khôi phục lối tắt ban đầu.",
-        "disableHint": "Khôi phục lối tắt Codex ban đầu. Khởi chạy trực tiếp từ màn hình nền sẽ không còn kiểm tra proxy qua Cockpit.",
-        "scopeHint": "Kiểm tra cấu hình và kết nối proxy HTTP/TCP được quản lý. Không xác nhận khả năng cách ly UDP, giọng nói hoặc WebRTC.",
-        "blocked": "Đã tạm dừng khởi chạy Codex",
-        "blockedHint": "Kiểm tra khởi động không đạt. Xem lại proxy của tài khoản rồi thử lại. Tuyến sẽ được kiểm tra lại mà không bỏ qua proxy.",
-        "back": "Quay lại bảng điều khiển",
-        "retry": "Kiểm tra lại và khởi chạy",
-        "checkFailed": "Không thể xác minh kết nối proxy đã chọn. Hãy kiểm tra lõi proxy và nút mạng.",
+      "launch": {
         "envChanged": "Cấu hình proxy đã thay đổi ngoài thao tác này. Tệp được giữ nguyên; hãy xem lại proxy trong .env trước khi thử lại.",
-        "restartRequired": "Phiên Codex đang chạy chưa dùng đầy đủ cấu hình proxy tài khoản và đã bị dừng. Hãy xác nhận bằng cách khởi chạy lại.",
-        "shortcutChanged": "Lối tắt đã bị thao tác khác thay đổi và được giữ nguyên. Hãy kiểm tra lối tắt trên màn hình nền trước.",
-        "stopFailed": "Không thể dừng phiên Codex có thiết lập không khớp. Hãy đóng phiên trước khi thử lại.",
-        "setupFailed": "Không thể cấu hình tích hợp màn hình nền. Lối tắt ban đầu được giữ nguyên; hãy thử lại.",
         "envStorage": "Không thể đọc hoặc lưu cấu hình proxy an toàn. Tệp ban đầu được giữ nguyên; hãy kiểm tra quyền thư mục.",
-        "envUnsupported": "Không thể quản lý định dạng .env an toàn nên tệp không bị ghi đè. Hãy kiểm tra dấu nháy chưa đóng hoặc phần nối dòng."
+        "envUnsupported": "Không thể quản lý định dạng .env an toàn nên tệp không bị ghi đè. Hãy kiểm tra dấu nháy chưa đóng hoặc phần nối dòng.",
+        "stopFailed": "Không thể dừng phiên Codex có thiết lập không khớp. Hãy đóng phiên trước khi thử lại."
+      },
+      "country": {
+        "title": "Kiểm tra quốc gia đầu ra trước khi khởi chạy",
+        "hint": "Tùy chọn cho mọi tài khoản, có hoặc không gán proxy. Kiểm tra đầu ra HTTP bằng ChatGPT Cloudflare trace khi khởi chạy trong Cockpit. Không thay đổi lối tắt màn hình nền.",
+        "expected": "Quốc gia hoặc khu vực mong muốn",
+        "choose": "Chọn quốc gia hoặc khu vực",
+        "save": "Lưu kiểm tra quốc gia",
+        "saved": "Đã lưu thiết lập kiểm tra quốc gia",
+        "mismatch": "Quốc gia đầu ra không khớp: mong muốn {{expected}}, phát hiện {{actual}}. Chưa khởi chạy Codex.",
+        "unavailable": "Không thể xác nhận quốc gia đầu ra. Chưa khởi chạy Codex; hãy kiểm tra kết nối và thử lại.",
+        "routeUnknown": "Không thể xác định tuyến proxy của ứng dụng khách. Chưa khởi chạy Codex; hãy xem lại proxy và .env.",
+        "changed": "Thiết lập quốc gia đã thay đổi trong khi kiểm tra. Hãy thử lại để kiểm tra thiết lập hiện tại.",
+        "storage": "Không thể đọc hoặc lưu thiết lập kiểm tra quốc gia.",
+        "invalid": "Hãy chọn quốc gia hoặc khu vực hợp lệ."
       }
     },
     "more": {

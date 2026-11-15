@@ -620,30 +620,3 @@ mod tests {
         );
     }
 }
-
-/// Exact-match binary replacement for owned shortcuts; never creates a .bak.
-pub(crate) fn replace_bytes_if_matches(path: &Path, expected: Option<&[u8]>, replacement: Option<&[u8]>) -> Result<bool, String> {
-    let lock = path_write_lock(path)?;
-    let _guard = lock.lock().map_err(|_| "文件写入锁已损坏".to_string())?;
-    let current = match fs::read(path) {
-        Ok(bytes) => Some(bytes),
-        Err(e) if e.kind() == std::io::ErrorKind::NotFound => None,
-        Err(_) => return Err("PROXY_SHORTCUT_STORAGE".into()),
-    };
-    if current.as_deref() != expected { return Ok(false); }
-    match replacement {
-        Some(bytes) => {
-            let parent = path.parent().ok_or("PROXY_SHORTCUT_STORAGE")?;
-            fs::create_dir_all(parent).map_err(|_| "PROXY_SHORTCUT_STORAGE")?;
-            let temporary = build_temp_file_path(parent, path, "atomic");
-            if let Err(e) = write_synced_temp_file_bytes(&temporary, bytes) { let _ = fs::remove_file(&temporary); return Err(e); }
-            if fs::rename(&temporary, path).is_err() { let _ = fs::remove_file(&temporary); return Err("PROXY_SHORTCUT_STORAGE".into()); }
-        }
-        None => match fs::remove_file(path) {
-            Ok(()) => (),
-            Err(e) if e.kind() == std::io::ErrorKind::NotFound => (),
-            Err(_) => return Err("PROXY_SHORTCUT_STORAGE".into()),
-        },
-    }
-    Ok(true)
-}

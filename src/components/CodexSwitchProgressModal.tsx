@@ -1,3 +1,4 @@
+import { codexCountryErrorValues } from '../utils/codexProxyCountry';
 import { resolveCodexAccountDisplayName } from "../utils/codexAccountDisplayName";
 import { useEffect, useMemo, useState } from "react";
 import {
@@ -142,7 +143,7 @@ export function CodexSwitchProgressModal() {
         if (detail.type === "error") {
           const prerequisite = proxyEnginePrerequisiteKey(detail.error) || codexLaunchErrorKey(detail.error);
           const errorText =
-            prerequisite ? t(prerequisite) : detail.error || base.error || t("common.failed", "失败");
+            prerequisite ? t(prerequisite, codexCountryErrorValues(detail.error)) : detail.error || base.error || t("common.failed", "失败");
           const authFailure =
             detail.authFailure === undefined
               ? base.authFailure
@@ -502,7 +503,7 @@ export function CodexSwitchProgressModal() {
       });
     } catch (error) {
       const errorKey = codexLaunchErrorKey(error);
-      setActionError(errorKey ? t(errorKey) : String(error).replace(/^Error:\s*/, ""));
+      setActionError(errorKey ? t(errorKey, codexCountryErrorValues(error)) : String(error).replace(/^Error:\s*/, ""));
     } finally {
       setRetryBusy(null);
     }
@@ -581,7 +582,7 @@ export function CodexSwitchProgressModal() {
               const failureKey = codexLaunchErrorKey(failureValue);
               const failure =
                 step.status === "error"
-                  ? failureKey ? t(failureKey) : conciseCodexCredentialFailure(failureValue)
+                  ? failureKey ? t(failureKey, codexCountryErrorValues(failureValue)) : conciseCodexCredentialFailure(failureValue)
                   : null;
               const renderedDetailLines =
                 failure && !detailLines.some((line) => line.includes(failure))

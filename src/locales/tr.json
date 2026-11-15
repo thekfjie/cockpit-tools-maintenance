@@ -5854,26 +5854,25 @@
       "runtimeReadFailed": "Yerel vekil durumu geçici olarak okunamıyor. Yeniden deneyin.",
       "modeClient": "İstemci ayarlarını kullan",
       "clientHint": "Bu hesabın özgün .env ve sistem proxy ayarlarını korur; Cockpit hesap veya ortak proxy ayarlarını uygulamaz.",
-      "desktop": {
-        "title": "Masaüstü başlatma entegrasyonu",
-        "enable": "Masaüstü başlatma entegrasyonunu etkinleştir",
-        "enabled": "Masaüstü başlatma entegrasyonu: etkin",
-        "disable": "Özgün kısayolu geri yükle",
-        "enableHint": "Codex masaüstü kısayolunu geçerli hesabın başlatma akışına bağlar. Cockpit arka planda başlar, proxy’yi geri yükler ve Codex’i açmadan bağlantıyı denetler. Kapatıldığında özgün kısayol geri yüklenir.",
-        "disableHint": "Özgün Codex kısayolunu geri yükler. Masaüstünden doğrudan başlatma artık Cockpit proxy denetimlerini çalıştırmaz.",
-        "scopeHint": "Yönetilen HTTP/TCP proxy yapılandırmasını ve bağlantısını denetler. UDP, ses veya WebRTC yalıtımını doğrulamaz.",
-        "blocked": "Codex başlatma duraklatıldı",
-        "blockedHint": "Başlatma denetimleri geçilemedi. Hesap proxy ayarlarını inceleyip yeniden deneyin. Proxy atlanmadan rota yeniden denetlenir.",
-        "back": "Panele dön",
-        "retry": "Yeniden denetle ve başlat",
-        "checkFailed": "Seçilen proxy bağlantısı doğrulanamadı. Proxy çekirdeğini ve düğümü denetleyin.",
+      "launch": {
         "envChanged": "Proxy yapılandırması bu işlem dışında değişti. Dosya korundu; yeniden denemeden önce .env proxy ayarlarını inceleyin.",
-        "restartRequired": "Çalışan Codex örneği hesabın tüm proxy ayarlarını kullanmıyordu ve durduruldu. Yeniden başlatarak onaylayın.",
-        "shortcutChanged": "Kısayol başka bir işlem tarafından değiştirildi ve korundu. Önce masaüstü kısayolunu inceleyin.",
-        "stopFailed": "Ayarları uyuşmayan Codex örneği durdurulamadı. Yeniden denemeden önce kapatın.",
-        "setupFailed": "Masaüstü entegrasyonu yapılandırılamadı. Özgün kısayol korundu; yeniden deneyin.",
         "envStorage": "Proxy yapılandırması güvenli biçimde okunamadı veya kaydedilemedi. Özgün dosya korundu; klasör izinlerini denetleyin.",
-        "envUnsupported": ".env biçimi güvenle yönetilemedi ve üzerine yazılmadı. Kapatılmamış tırnakları ve satır devamlarını denetleyin."
+        "envUnsupported": ".env biçimi güvenle yönetilemedi ve üzerine yazılmadı. Kapatılmamış tırnakları ve satır devamlarını denetleyin.",
+        "stopFailed": "Ayarları uyuşmayan Codex örneği durdurulamadı. Yeniden denemeden önce kapatın."
+      },
+      "country": {
+        "title": "Başlatmadan önce çıkış ülkesini denetle",
+        "hint": "Proxy bağlı olsun veya olmasın tüm hesaplar için isteğe bağlıdır. Cockpit içinden başlatırken HTTP çıkışını ChatGPT Cloudflare trace ile denetler. Masaüstü kısayolları değiştirilmez.",
+        "expected": "Beklenen ülke veya bölge",
+        "choose": "Ülke veya bölge seçin",
+        "save": "Ülke denetimini kaydet",
+        "saved": "Ülke denetimi ayarları kaydedildi",
+        "mismatch": "Çıkış ülkesi uyuşmuyor: beklenen {{expected}}, algılanan {{actual}}. Codex başlatılmadı.",
+        "unavailable": "Çıkış ülkesi doğrulanamadı. Codex başlatılmadı; bağlantıyı denetleyip yeniden deneyin.",
+        "routeUnknown": "İstemci proxy rotası belirlenemedi. Codex başlatılmadı; istemci proxy ve .env ayarlarını inceleyin.",
+        "changed": "Doğrulama sırasında ülke ayarları değişti. Geçerli ayarları doğrulamak için yeniden deneyin.",
+        "storage": "Ülke denetimi ayarları okunamadı veya kaydedilemedi.",
+        "invalid": "Geçerli bir ülke veya bölge seçin."
       }
     },
     "more": {

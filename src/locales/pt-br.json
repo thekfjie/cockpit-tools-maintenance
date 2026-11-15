@@ -5854,26 +5854,25 @@
       "runtimeReadFailed": "O estado do proxy local está temporariamente indisponível. Tente novamente.",
       "modeClient": "Usar configurações do cliente",
       "clientHint": "Preserva as configurações originais de .env e do proxy do sistema desta conta; não aplica proxy de conta nem compartilhado do Cockpit.",
-      "desktop": {
-        "title": "Integração de inicialização pela área de trabalho",
-        "enable": "Ativar integração pela área de trabalho",
-        "enabled": "Integração pela área de trabalho: ativada",
-        "disable": "Restaurar atalho original",
-        "enableHint": "Vincula o atalho do Codex à inicialização da conta atual. Inicia o Cockpit em segundo plano, restaura o proxy e verifica a conexão antes de abrir o Codex. Desativar restaura o atalho original.",
-        "disableHint": "Restaura o atalho original do Codex. A inicialização direta pela área de trabalho não executará mais as verificações de proxy do Cockpit.",
-        "scopeHint": "Verifica a configuração e a conexão do proxy HTTP/TCP gerenciado. Não certifica o isolamento de UDP, voz ou WebRTC.",
-        "blocked": "Inicialização do Codex pausada",
-        "blockedHint": "As verificações de inicialização falharam. Revise o proxy da conta e tente novamente. A rota será verificada de novo sem ignorar o proxy.",
-        "back": "Voltar ao painel",
-        "retry": "Verificar novamente e iniciar",
-        "checkFailed": "Não foi possível verificar a conexão do proxy selecionado. Verifique o núcleo do proxy e o nó.",
+      "launch": {
         "envChanged": "A configuração do proxy mudou fora desta operação. O arquivo foi preservado; revise o proxy em .env antes de tentar novamente.",
-        "restartRequired": "A instância do Codex não usava toda a configuração de proxy da conta e foi encerrada. Confirme iniciando novamente.",
-        "shortcutChanged": "Outra operação alterou o atalho. Ele foi preservado; revise primeiro o atalho da área de trabalho.",
-        "stopFailed": "Não foi possível encerrar a instância do Codex com configurações diferentes. Feche-a antes de tentar novamente.",
-        "setupFailed": "Não foi possível configurar a integração da área de trabalho. O atalho original foi preservado; tente novamente.",
         "envStorage": "Não foi possível ler ou salvar com segurança a configuração do proxy. O arquivo original foi preservado; verifique as permissões da pasta.",
-        "envUnsupported": "O formato de .env não pôde ser gerenciado com segurança e não foi sobrescrito. Verifique aspas não fechadas e continuações de linha."
+        "envUnsupported": "O formato de .env não pôde ser gerenciado com segurança e não foi sobrescrito. Verifique aspas não fechadas e continuações de linha.",
+        "stopFailed": "Não foi possível encerrar a instância do Codex com configurações diferentes. Feche-a antes de tentar novamente."
+      },
+      "country": {
+        "title": "Verificar país de saída antes de iniciar",
+        "hint": "Opcional para todas as contas, com ou sem proxy vinculado. Verifica a saída HTTP pelo ChatGPT Cloudflare trace ao iniciar pelo Cockpit. Não altera atalhos da área de trabalho.",
+        "expected": "País ou região esperado",
+        "choose": "Escolha um país ou região",
+        "save": "Salvar verificação de país",
+        "saved": "Configurações de verificação de país salvas",
+        "mismatch": "País de saída diferente: esperado {{expected}}, detectado {{actual}}. O Codex não foi iniciado.",
+        "unavailable": "Não foi possível confirmar o país de saída. O Codex não foi iniciado; verifique a conexão e tente novamente.",
+        "routeUnknown": "Não foi possível determinar a rota de proxy do cliente. O Codex não foi iniciado; verifique o proxy do cliente e .env.",
+        "changed": "As configurações de país mudaram durante a verificação. Tente novamente com as configurações atuais.",
+        "storage": "Não foi possível ler ou salvar as configurações de país.",
+        "invalid": "Escolha um país ou região válido."
       }
     },
     "more": {

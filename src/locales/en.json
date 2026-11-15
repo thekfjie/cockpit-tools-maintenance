@@ -6085,26 +6085,25 @@
       "runtimeReadFailed": "Local proxy status is temporarily unavailable. Please retry.",
       "modeClient": "Use client settings",
       "clientHint": "Preserve this account’s original .env and system proxy settings; do not apply a Cockpit account or shared proxy.",
-      "desktop": {
-        "title": "Desktop launch integration",
-        "enable": "Enable desktop launch integration",
-        "enabled": "Desktop launch integration: enabled",
-        "disable": "Restore original shortcut",
-        "enableHint": "Connect the desktop Codex shortcut to the current account launch flow. It starts Cockpit in the background, restores the proxy and checks connectivity before opening Codex. Turning this off restores the original shortcut.",
-        "disableHint": "Restore the original Codex shortcut. Direct desktop launches will no longer run Cockpit’s proxy startup checks.",
-        "scopeHint": "Checks managed HTTP/TCP proxy configuration and connectivity. This does not certify UDP, voice or WebRTC isolation.",
-        "blocked": "Codex launch paused",
-        "blockedHint": "Startup checks did not pass. Review the account proxy settings, then retry. Retrying checks the route again without bypassing the proxy.",
-        "back": "Back to panel",
-        "retry": "Check again and launch",
-        "checkFailed": "The selected proxy connection could not be verified. Check the proxy core and node.",
+      "launch": {
         "envChanged": "Proxy configuration changed outside this operation. The file was preserved; review proxy settings in .env before retrying.",
-        "restartRequired": "The running Codex instance was not using the complete account proxy configuration and has been stopped. Confirm by launching again.",
-        "shortcutChanged": "The shortcut was changed by another operation. It was preserved; review the desktop shortcut first.",
-        "stopFailed": "Could not stop the Codex instance with mismatched settings. Exit it before retrying.",
-        "setupFailed": "Desktop integration could not be configured. The original shortcut was preserved; try again.",
         "envStorage": "Could not safely read or save the proxy configuration. The original file was preserved; check directory permissions and retry.",
-        "envUnsupported": "The .env format could not be safely managed and was not overwritten. Check unclosed quotes or line continuations."
+        "envUnsupported": "The .env format could not be safely managed and was not overwritten. Check unclosed quotes or line continuations.",
+        "stopFailed": "Could not stop the Codex instance with mismatched settings. Exit it before retrying."
+      },
+      "country": {
+        "title": "Check exit country before launch",
+        "hint": "Optional for all accounts, with or without a proxy binding. Checks the current HTTP exit using ChatGPT Cloudflare trace when launching inside Cockpit. Desktop shortcuts are unaffected.",
+        "expected": "Expected country or region",
+        "choose": "Choose a country or region",
+        "save": "Save country check",
+        "saved": "Country check settings saved",
+        "mismatch": "Exit country mismatch: expected {{expected}}, detected {{actual}}. Codex was not started.",
+        "unavailable": "Could not confirm the exit country. Codex was not started; check the connection and retry.",
+        "routeUnknown": "Could not determine the client proxy route. Codex was not started; review the client proxy and .env settings.",
+        "changed": "Country check settings changed during verification. Retry to verify the current settings.",
+        "storage": "Could not read or save country check settings.",
+        "invalid": "Choose a valid country or region."
       }
     },
     "more": {

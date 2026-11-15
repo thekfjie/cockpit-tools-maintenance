@@ -204,3 +204,18 @@ mod codex_direct_launch_tests {
         }
     }
 }
+
+pub(crate) fn proxy_environment_for_check(proxy: &CodexLaunchProxy) -> std::collections::BTreeMap<String, String> {
+    let mut result = std::collections::BTreeMap::new();
+    for key in ["http_proxy", "https_proxy", "all_proxy", "no_proxy"] {
+        if let Ok(value) = std::env::var(key).or_else(|_| std::env::var(key.to_ascii_uppercase())) {
+            result.insert(key.to_owned(), value);
+        }
+    }
+    let mut command = Command::new("never-launched-proxy-check");
+    apply_effective_proxy_env_to_command(&mut command, proxy);
+    for (key, value) in command.get_envs() {
+        result.insert(key.to_string_lossy().to_ascii_lowercase(), value.map(|v| v.to_string_lossy().into_owned()).unwrap_or_default());
+    }
+    result
+}

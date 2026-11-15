@@ -1,8 +1,11 @@
+import { codexCountryErrorKey } from './codexProxyCountry';
 import type { CodexSwitchAuthFailure } from './codexSwitchAuthFailure';
 
 /** Lifecycle failures are retryable setup errors, not requests to reauthorize. */
 export function codexLaunchErrorKey(error: unknown): string | null {
   const code = String(error ?? '').replace(/^Error:\s*/, '');
+  const countryKey = codexCountryErrorKey(error);
+  if (countryKey) return countryKey;
   // Startup repair adds instance/path context around these safe error codes.
   // Both switch-and-start and instance launch use this shared presentation.
   if (/\bCODEX_SESSION_VISIBILITY_ROLLBACK_FAILED\b/.test(code)) {
@@ -20,11 +23,10 @@ export function codexLaunchErrorKey(error: unknown): string | null {
     return 'codex.launchErrors.proxyEntryFailed';
   }
   const launchProxyErrors: Record<string, string> = {
-    PROXY_LAUNCH_CHECK_FAILED: 'codex.proxy.desktop.checkFailed',
-    PROXY_ENV_CHANGED: 'codex.proxy.desktop.envChanged',
-    PROXY_ENV_STORAGE: 'codex.proxy.desktop.envStorage',
-    PROXY_ENV_UNSUPPORTED: 'codex.proxy.desktop.envUnsupported',
-    PROXY_LAUNCH_STOP_FAILED: 'codex.proxy.desktop.stopFailed',
+    PROXY_ENV_CHANGED: 'codex.proxy.launch.envChanged',
+    PROXY_ENV_STORAGE: 'codex.proxy.launch.envStorage',
+    PROXY_ENV_UNSUPPORTED: 'codex.proxy.launch.envUnsupported',
+    PROXY_LAUNCH_STOP_FAILED: 'codex.proxy.launch.stopFailed',
   };
   if (Object.prototype.hasOwnProperty.call(launchProxyErrors, code)) return launchProxyErrors[code];
   const clientProxyErrors: Record<string, string> = {

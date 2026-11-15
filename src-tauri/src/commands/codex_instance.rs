@@ -135,6 +135,9 @@ impl CodexInstanceStartTarget {
             modules::codex_instance::preflight_egress_proxy_for_bind_account(
                 self.bind_account_id.as_deref(),
             ).await?;
+            modules::codex_proxy_launch_guard::check_for_launch(
+                self.bind_account_id.as_deref(), &self.user_data_dir,
+            ).await?;
         }
         Ok(())
     }
@@ -3102,7 +3105,7 @@ async fn codex_start_instance_internal(
             default_bind_account_id.as_deref(),
         ).await?;
         modules::codex_proxy_dotenv::apply(&default_dir, default_bind_account_id.as_deref().unwrap_or("__client__"), &launch_proxy)?;
-        modules::codex_proxy_launch_guard::preflight(&launch_proxy).await?;
+        modules::codex_proxy_launch_guard::check_for_launch(default_bind_account_id.as_deref(), &default_dir).await?;
         modules::codex_proxy_launch_guard::verify_profile(&default_dir, default_bind_account_id.as_deref().unwrap_or("__client__"), &launch_proxy)?;
         launch_proxy.append_electron_args(&mut injection_plan.args);
         emit_codex_instance_launch_step(
@@ -3421,7 +3424,7 @@ async fn codex_start_instance_internal(
         instance.bind_account_id.as_deref(),
     ).await?;
     modules::codex_proxy_dotenv::apply(instance_dir, instance.bind_account_id.as_deref().unwrap_or("__client__"), &launch_proxy)?;
-    modules::codex_proxy_launch_guard::preflight(&launch_proxy).await?;
+    modules::codex_proxy_launch_guard::check_for_launch(instance.bind_account_id.as_deref(), instance_dir).await?;
     modules::codex_proxy_launch_guard::verify_profile(instance_dir, instance.bind_account_id.as_deref().unwrap_or("__client__"), &launch_proxy)?;
     launch_proxy.append_electron_args(&mut injection_plan.args);
     emit_codex_instance_launch_step(

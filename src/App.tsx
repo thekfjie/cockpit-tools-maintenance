@@ -1,4 +1,3 @@
-import { CodexDesktopLaunchNotice } from './components/codex/CodexDesktopProxyEntry';
 import { CodexAccountServiceHost } from './components/codex/CodexAccountServiceHost';
 import { AppBackground } from './components/AppBackground';
 import { CodexPathRecoveryDialog } from './components/codex/CodexPathRecoveryDialog';
@@ -3589,7 +3588,6 @@ function MainApp() {
       className={`app-container${isWindowsPlatform() ? ' app-container-windows' : ''}${sideNavLayoutMode === 'classic' ? ' app-container-side-nav-classic' : ''}${sideNavLayoutMode === 'classic' && sideNavClassicCollapsed ? ' app-container-side-nav-classic-collapsed' : ''}`}
     >
       <AppBackground />
-      <CodexDesktopLaunchNotice />
       {/* 更新通知：活跃状态时保持挂载，关闭后继续保留当前更新状态 */}
       {shouldRenderUpdateNotification && (
         <div style={showUpdateNotification ? undefined : { display: 'none' }}>

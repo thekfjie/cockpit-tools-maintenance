@@ -5854,26 +5854,25 @@
       "runtimeReadFailed": "El estado del proxy local no está disponible temporalmente. Reintenta.",
       "modeClient": "Usar ajustes del cliente",
       "clientHint": "Conserva los ajustes originales de .env y del proxy del sistema de esta cuenta; no aplica un proxy de cuenta ni compartido de Cockpit.",
-      "desktop": {
-        "title": "Integración de inicio desde el escritorio",
-        "enable": "Activar integración de inicio desde el escritorio",
-        "enabled": "Integración de escritorio: activada",
-        "disable": "Restaurar acceso directo original",
-        "enableHint": "Conecta el acceso directo de Codex al inicio de la cuenta actual. Inicia Cockpit en segundo plano, restaura el proxy y comprueba la conexión antes de abrir Codex. Al desactivarlo se restaura el acceso directo original.",
-        "disableHint": "Restaura el acceso directo original de Codex. El inicio directo desde el escritorio dejará de ejecutar las comprobaciones del proxy de Cockpit.",
-        "scopeHint": "Comprueba la configuración y conexión del proxy HTTP/TCP administrado. No certifica el aislamiento de UDP, voz ni WebRTC.",
-        "blocked": "Inicio de Codex en pausa",
-        "blockedHint": "Las comprobaciones de inicio no se superaron. Revisa el proxy de la cuenta y vuelve a intentarlo. Se comprobará de nuevo la ruta sin omitir el proxy.",
-        "back": "Volver al panel",
-        "retry": "Comprobar de nuevo e iniciar",
-        "checkFailed": "No se pudo verificar la conexión del proxy seleccionado. Revisa el núcleo del proxy y el nodo.",
+      "launch": {
         "envChanged": "La configuración del proxy cambió fuera de esta operación. Se conservó el archivo; revisa los ajustes del proxy en .env antes de reintentar.",
-        "restartRequired": "La instancia de Codex no usaba la configuración completa del proxy de la cuenta y se ha detenido. Confirma iniciándola de nuevo.",
-        "shortcutChanged": "Otra operación modificó el acceso directo. Se conservó; revisa primero el acceso directo del escritorio.",
-        "stopFailed": "No se pudo detener la instancia de Codex con ajustes distintos. Ciérrala antes de reintentar.",
-        "setupFailed": "No se pudo configurar la integración de escritorio. Se conservó el acceso directo original; vuelve a intentarlo.",
         "envStorage": "No se pudo leer o guardar de forma segura la configuración del proxy. Se conservó el archivo original; revisa los permisos del directorio.",
-        "envUnsupported": "No se pudo administrar de forma segura el formato de .env y no se sobrescribió. Revisa las comillas sin cerrar y las continuaciones de línea."
+        "envUnsupported": "No se pudo administrar de forma segura el formato de .env y no se sobrescribió. Revisa las comillas sin cerrar y las continuaciones de línea.",
+        "stopFailed": "No se pudo detener la instancia de Codex con ajustes distintos. Ciérrala antes de reintentar."
+      },
+      "country": {
+        "title": "Comprobar el país de salida antes de iniciar",
+        "hint": "Opcional para todas las cuentas, con o sin proxy vinculado. Comprueba la salida HTTP actual mediante ChatGPT Cloudflare trace al iniciar desde Cockpit. No modifica los accesos directos del escritorio.",
+        "expected": "País o región esperado",
+        "choose": "Elige un país o región",
+        "save": "Guardar comprobación de país",
+        "saved": "Ajustes de comprobación de país guardados",
+        "mismatch": "El país de salida no coincide: esperado {{expected}}, detectado {{actual}}. Codex no se ha iniciado.",
+        "unavailable": "No se pudo confirmar el país de salida. Codex no se ha iniciado; revisa la conexión y reintenta.",
+        "routeUnknown": "No se pudo determinar la ruta de proxy del cliente. Codex no se ha iniciado; revisa el proxy del cliente y .env.",
+        "changed": "Los ajustes de país cambiaron durante la comprobación. Reintenta para verificar los ajustes actuales.",
+        "storage": "No se pudieron leer o guardar los ajustes de país.",
+        "invalid": "Elige un país o región válido."
       }
     },
     "more": {

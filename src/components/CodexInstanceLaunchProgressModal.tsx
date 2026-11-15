@@ -1,3 +1,4 @@
+import { codexCountryErrorKey, codexCountryErrorValues } from '../utils/codexProxyCountry';
 import { resolveCodexAccountDisplayName } from "../utils/codexAccountDisplayName";
 import { codexPathRecoveryKey, withCodexPathRecovery } from '../stores/useCodexPathRecoveryStore';
 import { isCodexLaunchCancelled } from '../utils/codexLaunchCancellation';
@@ -155,7 +156,7 @@ export function CodexInstanceLaunchProgressModal() {
         payload = { ...payload, error: t(prerequisiteKey) };
       }
       const lifecycleKey = payload.type === "error" ? codexLaunchErrorKey(payload.error) : null;
-      if (lifecycleKey) payload = { ...payload, error: t(lifecycleKey) };
+      if (lifecycleKey) payload = { ...payload, error: t(lifecycleKey, codexCountryErrorValues(payload.error)) };
       if (payload.type === "complete") setActionError(null);
       setState((previous) => {
         if ((payload.type === "cancelled" || payload.cancelled === true)
@@ -620,13 +621,13 @@ export function CodexInstanceLaunchProgressModal() {
     } catch (error) {
       if (isCodexLaunchUnconfirmed(error)) return;
       const errorKey = codexLaunchErrorKey(error);
-      setActionError(errorKey ? t(errorKey) : String(error).replace(/^Error:\s*/, ""));
+      setActionError(errorKey ? t(errorKey, codexCountryErrorValues(error)) : String(error).replace(/^Error:\s*/, ""));
     } finally {
       setRetryBusy(null);
     }
   };
 
-  const failedStepId = state.source === "switch-service"
+  const failedStepId = state.source === "switch-service" || codexCountryErrorKey(state.error) !== null
     ? undefined
     : state.steps.find((step) =>
         step.status === "error" || step.status === "warning",
@@ -681,7 +682,7 @@ export function CodexInstanceLaunchProgressModal() {
     } catch (error) {
       if (isCodexLaunchUnconfirmed(error)) return;
       const errorKey = codexLaunchErrorKey(error);
-      setActionError(errorKey ? t(errorKey) : String(error).replace(/^Error:\s*/, ""));
+      setActionError(errorKey ? t(errorKey, codexCountryErrorValues(error)) : String(error).replace(/^Error:\s*/, ""));
     } finally {
       setRetryBusy(null);
     }
@@ -841,7 +842,7 @@ export function CodexInstanceLaunchProgressModal() {
               const failureKey = codexLaunchErrorKey(failureValue);
               const failure =
                 step.status === "error"
-                  ? failureKey ? t(failureKey) : conciseCodexCredentialFailure(failureValue)
+                  ? failureKey ? t(failureKey, codexCountryErrorValues(failureValue)) : conciseCodexCredentialFailure(failureValue)
                   : null;
               const renderedDetailLines =
                 failure && !detailLines.some((line) => line.includes(failure))

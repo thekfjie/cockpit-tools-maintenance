@@ -5854,26 +5854,25 @@
       "runtimeReadFailed": "Lokaler Proxy-Status derzeit nicht verfügbar. Bitte erneut versuchen.",
       "modeClient": "Client-Einstellungen verwenden",
       "clientHint": "Die ursprünglichen .env- und Systemproxy-Einstellungen dieses Kontos beibehalten; keinen Konto- oder gemeinsamen Proxy von Cockpit anwenden.",
-      "desktop": {
-        "title": "Desktop-Startintegration",
-        "enable": "Desktop-Startintegration aktivieren",
-        "enabled": "Desktop-Startintegration: aktiviert",
-        "disable": "Ursprüngliche Verknüpfung wiederherstellen",
-        "enableHint": "Die Codex-Desktopverknüpfung mit dem Startablauf des aktuellen Kontos verbinden. Cockpit startet im Hintergrund, stellt den Proxy wieder her und prüft die Verbindung vor dem Start von Codex. Beim Deaktivieren wird die ursprüngliche Verknüpfung wiederhergestellt.",
-        "disableHint": "Die ursprüngliche Codex-Verknüpfung wiederherstellen. Beim direkten Desktopstart entfallen die Proxy-Startprüfungen von Cockpit.",
-        "scopeHint": "Prüft die verwaltete HTTP/TCP-Proxykonfiguration und Verbindung. Dies bestätigt keine Isolation von UDP, Sprache oder WebRTC.",
-        "blocked": "Codex-Start angehalten",
-        "blockedHint": "Die Startprüfungen sind fehlgeschlagen. Prüfen Sie die Kontoproxyeinstellungen und versuchen Sie es erneut. Die Route wird erneut geprüft, ohne den Proxy zu umgehen.",
-        "back": "Zurück zur Übersicht",
-        "retry": "Erneut prüfen und starten",
-        "checkFailed": "Die ausgewählte Proxyverbindung konnte nicht geprüft werden. Prüfen Sie Proxykern und Knoten.",
+      "launch": {
         "envChanged": "Die Proxykonfiguration wurde außerhalb dieses Vorgangs geändert. Die Datei wurde beibehalten; prüfen Sie die Proxyeinstellungen in .env vor dem erneuten Versuch.",
-        "restartRequired": "Die laufende Codex-Instanz verwendete nicht die vollständige Kontoproxykonfiguration und wurde beendet. Bestätigen Sie durch erneuten Start.",
-        "shortcutChanged": "Die Verknüpfung wurde durch einen anderen Vorgang geändert und beibehalten. Prüfen Sie zuerst die Desktopverknüpfung.",
-        "stopFailed": "Die Codex-Instanz mit abweichenden Einstellungen konnte nicht beendet werden. Beenden Sie sie vor dem erneuten Versuch.",
-        "setupFailed": "Die Desktopintegration konnte nicht eingerichtet werden. Die ursprüngliche Verknüpfung wurde beibehalten; versuchen Sie es erneut.",
         "envStorage": "Die Proxykonfiguration konnte nicht sicher gelesen oder gespeichert werden. Die ursprüngliche Datei wurde beibehalten; prüfen Sie die Verzeichnisberechtigungen.",
-        "envUnsupported": "Das .env-Format konnte nicht sicher verwaltet werden und wurde nicht überschrieben. Prüfen Sie offene Anführungszeichen und Zeilenfortsetzungen."
+        "envUnsupported": "Das .env-Format konnte nicht sicher verwaltet werden und wurde nicht überschrieben. Prüfen Sie offene Anführungszeichen und Zeilenfortsetzungen.",
+        "stopFailed": "Die Codex-Instanz mit abweichenden Einstellungen konnte nicht beendet werden. Beenden Sie sie vor dem erneuten Versuch."
+      },
+      "country": {
+        "title": "Ausgangsland vor dem Start prüfen",
+        "hint": "Optional für alle Konten, mit oder ohne Proxybindung. Prüft den aktuellen HTTP-Ausgang über ChatGPT Cloudflare trace beim Start in Cockpit. Desktopverknüpfungen bleiben unverändert.",
+        "expected": "Erwartetes Land oder Region",
+        "choose": "Land oder Region auswählen",
+        "save": "Länderprüfung speichern",
+        "saved": "Einstellungen der Länderprüfung gespeichert",
+        "mismatch": "Ausgangsland stimmt nicht überein: erwartet {{expected}}, erkannt {{actual}}. Codex wurde nicht gestartet.",
+        "unavailable": "Das Ausgangsland konnte nicht bestätigt werden. Codex wurde nicht gestartet; prüfen Sie die Verbindung und versuchen Sie es erneut.",
+        "routeUnknown": "Die Proxyroute des Clients konnte nicht ermittelt werden. Codex wurde nicht gestartet; prüfen Sie Clientproxy und .env.",
+        "changed": "Die Länderprüfung wurde während der Überprüfung geändert. Wiederholen Sie die Prüfung mit den aktuellen Einstellungen.",
+        "storage": "Die Einstellungen der Länderprüfung konnten nicht gelesen oder gespeichert werden.",
+        "invalid": "Wählen Sie ein gültiges Land oder eine gültige Region."
       }
     },
     "more": {

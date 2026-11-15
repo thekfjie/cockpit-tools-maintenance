@@ -81,6 +81,10 @@ fn recoverable_dotenv_journal_completes_both_crash_windows_and_retains_conflicts
     let (pending, after) = transition(State::default(), None, "a", &route(41001)).unwrap();
     write_state(&path, &pending).unwrap();
     fs::write(home.join(".env.bak"), "user-owned backup").unwrap();
+    let preview = preview_proxy_variables(&home, "a", &route(41001)).unwrap();
+    assert_eq!(preview.get("https_proxy").map(String::as_str), Some("socks5://127.0.0.1:41001"));
+    assert!(!home.join(".env").exists(), "country preflight must not change a profile");
+    assert_eq!(read_state(&path).unwrap().pending.as_ref().unwrap().after, after);
     apply_inner(&home, "a", &route(41001)).unwrap();
     assert_eq!(read_document(&home.join(".env")).unwrap(), after);
     assert_eq!(fs::read_to_string(home.join(".env.bak")).unwrap(), "user-owned backup");

@@ -5854,26 +5854,25 @@
       "runtimeReadFailed": "Stato del proxy locale temporaneamente non disponibile. Riprova.",
       "modeClient": "Usa impostazioni del client",
       "clientHint": "Mantieni le impostazioni originali .env e del proxy di sistema di questo account; non applicare proxy di account o condivisi di Cockpit.",
-      "desktop": {
-        "title": "Integrazione avvio dal desktop",
-        "enable": "Attiva integrazione avvio dal desktop",
-        "enabled": "Integrazione desktop: attiva",
-        "disable": "Ripristina collegamento originale",
-        "enableHint": "Collega il collegamento Codex all’avvio dell’account corrente. Cockpit si avvia in background, ripristina il proxy e verifica la connessione prima di aprire Codex. Disattivando questa opzione viene ripristinato il collegamento originale.",
-        "disableHint": "Ripristina il collegamento originale di Codex. L’avvio diretto dal desktop non eseguirà più i controlli proxy di Cockpit.",
-        "scopeHint": "Verifica configurazione e connessione del proxy HTTP/TCP gestito. Non certifica l’isolamento di UDP, voce o WebRTC.",
-        "blocked": "Avvio di Codex sospeso",
-        "blockedHint": "I controlli di avvio non sono riusciti. Verifica il proxy dell’account e riprova. Il percorso verrà controllato di nuovo senza aggirare il proxy.",
-        "back": "Torna al pannello",
-        "retry": "Ricontrolla e avvia",
-        "checkFailed": "Impossibile verificare la connessione del proxy selezionato. Controlla il motore proxy e il nodo.",
+      "launch": {
         "envChanged": "La configurazione del proxy è cambiata al di fuori di questa operazione. Il file è stato conservato; verifica il proxy in .env prima di riprovare.",
-        "restartRequired": "L’istanza Codex non usava l’intera configurazione proxy dell’account ed è stata arrestata. Conferma avviandola di nuovo.",
-        "shortcutChanged": "Un’altra operazione ha modificato il collegamento. È stato conservato; controlla prima il collegamento sul desktop.",
-        "stopFailed": "Impossibile arrestare l’istanza Codex con impostazioni diverse. Chiudila prima di riprovare.",
-        "setupFailed": "Impossibile configurare l’integrazione desktop. Il collegamento originale è stato conservato; riprova.",
         "envStorage": "Impossibile leggere o salvare in sicurezza la configurazione del proxy. Il file originale è stato conservato; controlla i permessi della cartella.",
-        "envUnsupported": "Impossibile gestire in sicurezza il formato .env, che non è stato sovrascritto. Controlla virgolette non chiuse e continuazioni di riga."
+        "envUnsupported": "Impossibile gestire in sicurezza il formato .env, che non è stato sovrascritto. Controlla virgolette non chiuse e continuazioni di riga.",
+        "stopFailed": "Impossibile arrestare l’istanza Codex con impostazioni diverse. Chiudila prima di riprovare."
+      },
+      "country": {
+        "title": "Verifica il paese di uscita prima dell’avvio",
+        "hint": "Facoltativo per tutti gli account, con o senza proxy associato. Verifica l’uscita HTTP tramite ChatGPT Cloudflare trace all’avvio da Cockpit. I collegamenti del desktop restano invariati.",
+        "expected": "Paese o regione previsto",
+        "choose": "Scegli un paese o una regione",
+        "save": "Salva verifica del paese",
+        "saved": "Impostazioni di verifica del paese salvate",
+        "mismatch": "Paese di uscita diverso: previsto {{expected}}, rilevato {{actual}}. Codex non è stato avviato.",
+        "unavailable": "Impossibile confermare il paese di uscita. Codex non è stato avviato; verifica la connessione e riprova.",
+        "routeUnknown": "Impossibile determinare il percorso proxy del client. Codex non è stato avviato; controlla il proxy del client e .env.",
+        "changed": "Le impostazioni del paese sono cambiate durante la verifica. Riprova con le impostazioni attuali.",
+        "storage": "Impossibile leggere o salvare le impostazioni del paese.",
+        "invalid": "Scegli un paese o una regione valido."
       }
     },
     "more": {

@@ -5854,26 +5854,25 @@
       "runtimeReadFailed": "État du proxy local temporairement indisponible. Réessayez.",
       "modeClient": "Utiliser les paramètres du client",
       "clientHint": "Conserver les paramètres .env et de proxy système d’origine de ce compte, sans appliquer de proxy de compte ou partagé de Cockpit.",
-      "desktop": {
-        "title": "Intégration du lancement depuis le bureau",
-        "enable": "Activer le lancement intégré depuis le bureau",
-        "enabled": "Lancement intégré depuis le bureau : activé",
-        "disable": "Restaurer le raccourci d’origine",
-        "enableHint": "Relier le raccourci Codex au lancement du compte actuel. Cockpit démarre en arrière-plan, rétablit le proxy et vérifie la connexion avant d’ouvrir Codex. La désactivation restaure le raccourci d’origine.",
-        "disableHint": "Restaurer le raccourci Codex d’origine. Le lancement direct depuis le bureau ne vérifiera plus le proxy via Cockpit.",
-        "scopeHint": "Vérifie la configuration et la connexion du proxy HTTP/TCP géré. Cela ne garantit pas l’isolation d’UDP, de la voix ou de WebRTC.",
-        "blocked": "Lancement de Codex suspendu",
-        "blockedHint": "Les vérifications de démarrage ont échoué. Vérifiez le proxy du compte puis réessayez. La route sera vérifiée à nouveau sans contourner le proxy.",
-        "back": "Revenir au panneau",
-        "retry": "Revérifier et lancer",
-        "checkFailed": "Impossible de vérifier la connexion du proxy sélectionné. Vérifiez le moteur du proxy et le nœud.",
+      "launch": {
         "envChanged": "La configuration du proxy a changé en dehors de cette opération. Le fichier a été conservé ; vérifiez le proxy dans .env avant de réessayer.",
-        "restartRequired": "L’instance Codex n’utilisait pas toute la configuration du proxy du compte et a été arrêtée. Confirmez en la relançant.",
-        "shortcutChanged": "Une autre opération a modifié le raccourci. Il a été conservé ; vérifiez d’abord le raccourci du bureau.",
-        "stopFailed": "Impossible d’arrêter l’instance Codex dont les paramètres diffèrent. Fermez-la avant de réessayer.",
-        "setupFailed": "Impossible de configurer l’intégration du bureau. Le raccourci d’origine a été conservé ; réessayez.",
         "envStorage": "Impossible de lire ou d’enregistrer la configuration du proxy en toute sécurité. Le fichier d’origine a été conservé ; vérifiez les autorisations du dossier.",
-        "envUnsupported": "Le format .env ne peut pas être géré en toute sécurité et n’a pas été écrasé. Vérifiez les guillemets non fermés et les continuations de ligne."
+        "envUnsupported": "Le format .env ne peut pas être géré en toute sécurité et n’a pas été écrasé. Vérifiez les guillemets non fermés et les continuations de ligne.",
+        "stopFailed": "Impossible d’arrêter l’instance Codex dont les paramètres diffèrent. Fermez-la avant de réessayer."
+      },
+      "country": {
+        "title": "Vérifier le pays de sortie avant le lancement",
+        "hint": "Optionnel pour tous les comptes, avec ou sans proxy associé. Vérifie la sortie HTTP via ChatGPT Cloudflare trace au lancement depuis Cockpit. Les raccourcis du bureau restent inchangés.",
+        "expected": "Pays ou région attendu",
+        "choose": "Choisir un pays ou une région",
+        "save": "Enregistrer la vérification du pays",
+        "saved": "Paramètres de vérification du pays enregistrés",
+        "mismatch": "Pays de sortie différent : attendu {{expected}}, détecté {{actual}}. Codex n’a pas été lancé.",
+        "unavailable": "Impossible de confirmer le pays de sortie. Codex n’a pas été lancé ; vérifiez la connexion et réessayez.",
+        "routeUnknown": "Impossible de déterminer la route proxy du client. Codex n’a pas été lancé ; vérifiez le proxy du client et .env.",
+        "changed": "Les paramètres du pays ont changé pendant la vérification. Réessayez pour vérifier les paramètres actuels.",
+        "storage": "Impossible de lire ou d’enregistrer les paramètres du pays.",
+        "invalid": "Choisissez un pays ou une région valide."
       }
     },
     "more": {

@@ -178,3 +178,23 @@
 .codex-proxy-rules-table tbody tr:last-child td { border-bottom: 0; }
 .codex-proxy-rules-table td.is-following { color: var(--primary); font-weight: 600; }
 .codex-proxy-rules-open { appearance: none; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: inherit; font-size: 12px; }
+
+.codex-proxy-country-guard {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+}
+.codex-proxy-country-toggle {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+.codex-proxy-country-guard .codex-proxy-page-note {
+  font-size: 12px;
+  line-height: 1.6;
+}
+.codex-proxy-country-guard .codex-proxy-field {
+  max-width: 360px;
+  margin: 12px 0;
+}

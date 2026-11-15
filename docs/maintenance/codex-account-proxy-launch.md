@@ -1,33 +1,44 @@
 # Windows Codex account proxy launch
 
-Account switching keeps the existing CODEX_HOME, registered Windows package identity,
-project/history projection, MCP and skills behavior. No user account is used by CI.
+Account switching keeps the existing CODEX_HOME, Windows package identity,
+project/history projection, MCP and skills behavior. CI does not use real accounts.
 
 - Independent and shared account proxies use the existing stable loopback ingress.
-- Client settings is a separate persisted choice; existing direct choices stay direct.
-- Only managed Windows launches take ownership of proxy settings in .env.
-  Original settings are recorded per account and profile, encrypted in app data.
-  Absence and empty files remain distinct; unrelated user edits are preserved.
-- A write-ahead journal plus exact-content comparison makes interrupted changes
-  recoverable. A modified owned section is an actionable conflict, never overwritten.
-  Snapshots are bounded; no plaintext .env.bak or new CODEX_HOME is created.
-- Before launch, a credential-free HTTPS HEAD verifies connectivity through the
-  selected loopback proxy. TLS/login/WAF HTTP responses do not refresh credentials.
-  Failed transport checks leave the existing switch/start progress UI available.
-- Existing loopback entries cannot silently become direct when unbound. Restart
-  applies client-original or direct settings after restoring the previous takeover.
-- Desktop integration is opt-in in proxy account settings. It replaces only the
-  current user's Codex.lnk, preserves its icon and encrypted original bytes, and
-  restores them on disable. It never silently replaces a subsequently edited link.
-  It launches Cockpit in the background and reuses the existing launch transaction.
-  Errors persist until the React panel is ready; retry revalidates, never bypasses.
+- Client settings remains separate from an explicit force-direct choice.
+- The existing managed .env projection preserves per-account originals, unrelated
+  edits, absent/empty files, and recoverable encrypted ownership metadata.
 
-## Validation boundary
+## Optional country check inside Cockpit
 
-Tests use generated account records, temporary profiles and loopback sockets. They
-never switch a real account, query a real model or install/start the user's Codex.
-Windows package builds run on GitHub Actions. Successful transport/configuration
-checks are not proof of the actual client's complete network path. No claim is
-made that UDP, WebRTC or voice is isolated; enforcing that before any packet would
-require a separately supported OS-level network policy. Launches bypassing the
-managed desktop entry do not run its startup checks.
+The account proxy dialog exposes an independent country-check setting, disabled
+by default. An account without a proxy binding can also choose an expected country.
+The setting is saved separately from the proxy binding.
+
+When launching from Cockpit, ordinary instance startup and switch-and-start both
+check the expected HTTP exit before proceeding, then recheck just before starting
+the GUI. Retry repeats the check; skipping a launch-progress step never skips it.
+The check is not applied to prepare-only CLI actions.
+
+A credential-free GET to ChatGPT Cloudflare trace reads its loc country code.
+A mismatch shows expected and observed ISO country codes and blocks launch.
+Timeouts, non-success responses, invalid/ambiguous country data or settings changes
+also block launch. No cookies, OAuth tokens, quota checks or model requests are sent.
+A selected proxy failure never falls back to another route.
+
+Bound proxies use the same stable ingress as the client. Unbound modes inspect
+the launch environment and the existing .env projection without changing either,
+and use the existing system-proxy resolver when applicable. Unsupported .env
+interpolation is not guessed. Country checking does not certify every client
+protocol or dynamic PAC/Chromium-specific routing rule.
+
+## Desktop behavior
+
+There is no desktop-startup integration, background launcher, shortcut editor or
+startup hook. This version does not inspect, replace, migrate or restore desktop
+shortcuts. Opening Codex directly is outside the Cockpit startup check.
+
+## Validation
+
+Tests use temporary profiles, generated policies and loopback sockets. They do
+not install or start the user's Codex, switch a real account, or use account tokens.
+Windows builds and regression checks run on GitHub Actions.
