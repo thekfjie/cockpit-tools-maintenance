@@ -3,6 +3,9 @@ run-name: Windows maintenance · ${{ github.ref_name }}
 on:
   workflow_dispatch:
     inputs:
+      backendOnly:
+        type: boolean
+        default: false
       uiOnly:
         type: boolean
         default: false
@@ -46,6 +49,7 @@ jobs:
       - name: Install frontend dependencies
         run: npm ci --prefer-offline --no-audit --no-fund
       - name: Frontend and release regressions
+        if: ${{ !inputs.backendOnly }}
         shell: bash
         run: |
           set -euo pipefail
