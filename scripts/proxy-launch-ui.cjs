@@ -39,7 +39,13 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  await shot('client');
  await ev("document.querySelector('.codex-proxy-country-evidence').open=true; document.querySelector('.codex-proxy-country-guard').scrollIntoView({block:'end'})");await wait(100);
  await shot('country');
- for(const index of [0,1,3]){await ev("document.querySelectorAll('[role=radio]')["+index+"].click()");await wait(100);assert(await ev("!document.querySelector('.codex-proxy-env-editor')"),'ENV visible in non-client mode '+index);}
+ for(const index of [0,1,3]){
+   await ev("document.querySelectorAll('[role=radio]')["+index+"].scrollIntoView({block:'center'});document.querySelectorAll('[role=radio]')["+index+"].click()");
+   for(let n=0;n<20;n++){if(await ev("!document.querySelector('.codex-proxy-env-editor')"))break;await wait(100);}
+   console.log('Mode transition',index,await ev("({modes:[...document.querySelectorAll('[role=radio]')].map(n=>({checked:n.getAttribute('aria-checked'),disabled:n.disabled})),errors:window.fixtureErrors})"));
+   await shot('mode-'+index);
+   assert(await ev("!document.querySelector('.codex-proxy-env-editor')"),'ENV visible in non-client mode '+index);
+ }
  await ev("document.documentElement.dataset.theme='dark';document.querySelectorAll('[role=radio]')[2].click()");await wait(200);
  await shot('client-dark');
  fs.writeFileSync(path.join(output,'result.json'),JSON.stringify({passed:true,checks:['four modes','ENV only in client mode','recognized HTTPS variable','collapsed evidence','light and dark rendering'],syntheticAccounts:true,desktopInstalled:false},null,2));
