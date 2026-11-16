@@ -283,8 +283,12 @@ fn managed_and_direct_routes_remove_conflicting_dotenv_assignments_and_restore_o
         let document = projected.as_deref().unwrap();
         assert!(!document.contains("previous.invalid"));
         assert!(document.contains("KEEP=untouched"));
-        let expected: BTreeMap<String, String> = proxy.dotenv_overrides().unwrap()
-            .into_iter().map(|(key, value)| (key.to_ascii_lowercase(), value)).collect();
+        let expected: BTreeMap<String, String> = proxy
+            .dotenv_overrides()
+            .unwrap()
+            .into_iter()
+            .map(|(key, value)| (key.to_ascii_lowercase(), value))
+            .collect();
         assert_eq!(parse_proxy_variables(document).unwrap(), expected);
         let (_, restored) = step(state, projected, "client", CodexLaunchProxy::ClientDefaults);
         assert_eq!(restored.as_deref(), Some(original));
