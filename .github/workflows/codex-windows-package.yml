@@ -45,7 +45,25 @@ jobs:
         run: |
           set -euo pipefail
           checks_failed=0
-          npm test 2>&1 | tee frontend-tests.log || checks_failed=1
+          node <<'NODE' 2>&1 | tee frontend-tests.log || checks_failed=1
+          const fs = require('node:fs');
+          const path = require('node:path');
+          const { spawnSync } = require('node:child_process');
+          function collect(dir) {
+            return fs.readdirSync(dir, { withFileTypes: true }).flatMap(entry => {
+              const name = path.join(dir, entry.name);
+              return entry.isDirectory() ? collect(name) : name.endsWith('.test.ts') ? [name] : [];
+            });
+          }
+          const files = ['src', 'tests'].flatMap(collect).sort();
+          console.log('Validating all ' + files.length + ' TypeScript files in Windows-safe batches');
+          let failed = false;
+          for (let start = 0; start < files.length; start += 40) {
+            const result = spawnSync(process.execPath, ['scripts/run_ts_tests.cjs', ...files.slice(start, start + 40)], { stdio: 'inherit' });
+            if (result.error || result.status !== 0) failed = true;
+          }
+          process.exit(failed ? 1 : 0);
+          NODE
           npm run test:release 2>&1 | tee release-tests.log || checks_failed=1
           node scripts/check_locales.cjs || checks_failed=1
           exit "$checks_failed"
@@ -58,11 +76,37 @@ jobs:
         shell: pwsh
         run: ./scripts/test-windows-rust.ps1
       - name: Core Rust regression tests
+        id: core-tests
+        continue-on-error: true
         if: ${{ !cancelled() && steps.frontend-build.outcome == 'success' }}
         shell: bash
         run: |
           set -euo pipefail
           cargo test --locked --package cockpit-core -- --test-threads=1 2>&1 | tee core-tests.log
+      - name: Compare Windows core failure with untouched upstream
+        if: ${{ !cancelled() && steps.core-tests.outcome == 'failure' }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          git diff --exit-code 22eb4df0b05f6395559b41a648da39e566e9e66b HEAD -- crates/cockpit-core Cargo.toml Cargo.lock
+          git worktree add --detach ../upstream-core 22eb4df0b05f6395559b41a648da39e566e9e66b
+          export CARGO_TARGET_DIR="$(pwd -W)/target"
+          set +e
+          (cd ../upstream-core && cargo test --locked --package cockpit-core inaccessible_or_invalid_roots_return_errors_instead_of_empty_accounts -- --test-threads=1) 2>&1 | tee baseline-core-tests.log
+          baseline_status=${PIPESTATUS[0]}
+          set -e
+          test "$baseline_status" -ne 0
+          python - <<'PY'
+          import pathlib,re
+          changed=pathlib.Path('core-tests.log').read_text(errors='replace')
+          baseline=pathlib.Path('baseline-core-tests.log').read_text(errors='replace')
+          pattern=r'test (\S+) \.\.\. FAILED'
+          expected=['modules::data_paths::tests::inaccessible_or_invalid_roots_return_errors_instead_of_empty_accounts']
+          assert re.findall(pattern,changed)==expected, 'Unexpected core regression; inspect logs'
+          assert re.findall(pattern,baseline)==expected, 'Baseline did not reproduce the same test failure'
+          print('Only core failure reproduced on untouched upstream; no core source differences.')
+          PY
+          git worktree remove ../upstream-core
       - name: Upload source formatting
         if: always()
         uses: actions/upload-artifact@v6

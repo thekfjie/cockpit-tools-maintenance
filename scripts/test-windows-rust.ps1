@@ -60,7 +60,7 @@ try {
         'provider_gateway_port_probe', 'occupied_persisted_gateway_port_is_released_before_start',
         'codex_proxy_dotenv', 'codex_proxy_env', 'codex_proxy_launch_guard', 'codex_account_proxy',
         'codex_client_proxy::tests', 'codex_proxy_desktop_router::tests', 'codex_direct_launch_tests',
-        'quota_proxy_persistence', 'default_and_managed_instance_preflight', 'codex_proxy_direct_hosts', 'codex_proxy_runtime_unified')
+        'quota_proxy_persistence', 'default_and_managed_instance_preflight', 'codex_proxy_direct_hosts', 'codex_proxy_runtime::tests', 'codex_proxy_runtime::pressure_tests')
     $failedFilters = @()
     foreach ($filter in $filters) {
         $listed = & $testExe $filter --list
