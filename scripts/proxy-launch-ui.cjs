@@ -12,8 +12,8 @@ const mocks = {
 let browser, socket;
 const wait=ms=>new Promise(r=>setTimeout(r,ms));
 (async()=>{
- await require('esbuild').build({entryPoints:[path.join(__dirname,'proxy-launch-ui.fixture.tsx')],bundle:true,outfile:path.join(base,'fixture.js'),format:'iife',jsx:'automatic',loader:{'.css':'css','.png':'dataurl','.svg':'dataurl','.woff2':'dataurl'},plugins:[{name:'isolated-accounts',setup(build){build.onResolve({filter:/(useCodexProxyExitEditor|CodexProxyWorkspaceContext|useProxyLatency|CodexProxyRuntimeStatus)$/}, args=>({path:args.path.split('/').at(-1),namespace:'fixture'}));build.onLoad({filter:/.*/,namespace:'fixture'},args=>({contents:mocks[args.path],loader:'js'}));}}]});
- fs.writeFileSync(path.join(base,'index.html'),'<!doctype html><html lang="zh-CN"><meta charset="UTF-8"><link rel="stylesheet" href="fixture.css"><div id="root"></div><script src="fixture.js"></script></html>');
+ await require('esbuild').build({entryPoints:[path.join(__dirname,'proxy-launch-ui.fixture.tsx')],bundle:true,outfile:path.join(base,'fixture.js'),format:'iife',jsx:'automatic',define:{'import.meta.env':'{}'},loader:{'.css':'css','.png':'dataurl','.svg':'dataurl','.woff2':'dataurl'},plugins:[{name:'isolated-accounts',setup(build){build.onResolve({filter:/(useCodexProxyExitEditor|CodexProxyWorkspaceContext|useProxyLatency|CodexProxyRuntimeStatus)$/}, args=>({path:args.path.split('/').at(-1),namespace:'fixture'}));build.onLoad({filter:/.*/,namespace:'fixture'},args=>({contents:mocks[args.path],loader:'js'}));}}]});
+ fs.writeFileSync(path.join(base,'index.html'),'<!doctype html><html lang="zh-CN"><meta charset="UTF-8"><link rel="stylesheet" href="fixture.css"><div id="root"></div><script>window.fixtureErrors=[];window.addEventListener("error",e=>window.fixtureErrors.push(e.message));window.addEventListener("unhandledrejection",e=>window.fixtureErrors.push(String(e.reason)));</script><script src="fixture.js"></script></html>');
  const port=await new Promise((resolve,reject)=>{const s=require('node:net').createServer();s.once('error',reject);s.listen(0,'127.0.0.1',()=>{const p=s.address().port;s.close(()=>resolve(p));});});
  const browserPath=['C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe','C:/Program Files/Google/Chrome/Application/chrome.exe'].find(fs.existsSync);
  if(!browserPath)throw Error('No installed Windows Chromium');
@@ -27,6 +27,7 @@ const wait=ms=>new Promise(r=>setTimeout(r,ms));
  const ev=async expression=>{const r=await send('Runtime.evaluate',{expression,returnByValue:true,awaitPromise:true});if(r.exceptionDetails)throw Error(r.exceptionDetails.exception?.description||r.exceptionDetails.text);return r.result.value;};
  const assert=(v,m)=>{if(!v)throw Error(m);};
  for(let n=0;n<40;n++){if(await ev("!!document.querySelector('[role=switch]:not(:disabled)')"))break;await wait(250);}
+ console.log('Browser errors:',await ev('window.fixtureErrors'));
  assert(await ev("document.querySelectorAll('[role=radio]').length===4"),'Four account modes missing');
  assert(await ev("!document.querySelector('.codex-proxy-env-editor')"),'ENV visible in follow mode');
  assert(await ev("!document.querySelector('.codex-proxy-country-evidence').open"),'Evidence not collapsed');
