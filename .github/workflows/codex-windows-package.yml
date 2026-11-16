@@ -143,6 +143,8 @@ jobs:
           node-version: 22
           cache: npm
       - run: npm ci --prefer-offline --no-audit --no-fund
+      - run: npm test -- src/components/codex/CodexProxyAccountDialog.test.ts src/components/codex/CodexProxyCountryGuard.test.ts src/components/codex/CodexProxyEnvEditor.test.ts
+      - run: npm run typecheck
       - run: node scripts/proxy-launch-ui.cjs
       - uses: actions/upload-artifact@v6
         if: always()
