@@ -2,13 +2,18 @@ name: Windows maintenance build
 run-name: Windows maintenance · ${{ github.ref_name }}
 on:
   workflow_dispatch:
+    inputs:
+      uiOnly:
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
-  group: maintenance-windows-${{ github.ref }}
+  group: maintenance-windows-${{ github.ref }}-${{ inputs.uiOnly }}
   cancel-in-progress: true
 jobs:
   windows:
+    if: ${{ !inputs.uiOnly }}
     runs-on: windows-latest
     timeout-minutes: 90
     env:
@@ -126,3 +131,22 @@ jobs:
           path: |
             *-tests.log
             windows-build.log
+
+  ui:
+    if: ${{ inputs.uiOnly }}
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --prefer-offline --no-audit --no-fund
+      - run: node scripts/proxy-launch-ui.cjs
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: proxy-launch-ui
+          path: proxy-ui-evidence
+          retention-days: 7
