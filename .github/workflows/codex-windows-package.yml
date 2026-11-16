@@ -88,6 +88,7 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          git fetch --depth=1 https://github.com/jlcodes99/cockpit-tools.git 22eb4df0b05f6395559b41a648da39e566e9e66b
           git diff --exit-code 22eb4df0b05f6395559b41a648da39e566e9e66b HEAD -- crates/cockpit-core Cargo.toml Cargo.lock
           git worktree add --detach ../upstream-core 22eb4df0b05f6395559b41a648da39e566e9e66b
           export CARGO_TARGET_DIR="$(pwd -W)/target"
