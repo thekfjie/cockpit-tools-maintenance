@@ -61,3 +61,16 @@ test('Windows launch policy is not offered as an unsupported desktop feature on 
   assert.equal(d.tree().some(node => node.type === 'CodexProxyEnvEditor'), false);
   d.h.unmount();
 });
+
+test('account editors use distinct sibling identities so switching modes removes the ENV editor', () => {
+  const d = dialog();
+  d.modes()[2].props.onClick();
+  const env = d.tree().find(node => node.type === 'CodexProxyEnvEditor');
+  const country = d.tree().find(node => node.type === 'CodexProxyCountryGuard');
+  assert.ok(env && country);
+  assert.notEqual(env.key, country.key);
+  d.modes()[0].props.onClick();
+  assert.equal(d.tree().some(node => node.type === 'CodexProxyEnvEditor'), false);
+  assert.equal(d.tree().find(node => node.type === 'CodexProxyCountryGuard').key, country.key);
+  d.h.unmount();
+});

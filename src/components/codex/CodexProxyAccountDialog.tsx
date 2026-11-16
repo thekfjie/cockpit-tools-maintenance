@@ -111,7 +111,7 @@ export function CodexProxyAccountDialog({ accountId, initialTab, initialMode, on
                 <small>{t(value === 'client' ? 'codex.proxy.clientHint' : value === 'disabled' ? 'codex.proxy.disabledHint' : value === 'follow' ? 'codex.proxy.managerAccounts.followHint' : 'codex.proxy.managerAccounts.independentHint')}</small></span>
             </button>)}
           </div>
-          {mode === 'client' ? <CodexProxyEnvEditor key={accountId} accountId={accountId} disabled={measuring || !targetReady}
+          {mode === 'client' ? <CodexProxyEnvEditor key={"env:" + accountId} accountId={accountId} disabled={measuring || !targetReady}
             onDirtyChange={setEnvDirty} onSaved={() => setEnvRevision(value => value + 1)} /> : mode === 'disabled' ? <p className="codex-proxy-page-note">{t('codex.proxy.disabledWarning')}</p> : mode === 'follow' ? <div className="codex-proxy-account-follow-preview"><ShieldCheck size={21} /><div>
             <span>{t('codex.proxy.managerAccounts.proxy')}</span><strong>{unifiedErrorKey ? t(unifiedErrorKey) : !unified ? t('common.loading') : activeUnified ? sharedLabel : t('codex.proxy.modeDefault')}</strong>
             {unifiedErrorKey && <button type="button" className="btn btn-secondary compact" onClick={reloadUnified}>{t('common.retry')}</button>}
@@ -137,7 +137,7 @@ export function CodexProxyAccountDialog({ accountId, initialTab, initialMode, on
             </div>
           </div>}
           <p className="codex-proxy-page-note">{t('codex.proxy.restartHint')}</p>
-          {supportsLaunchPolicy && <CodexProxyCountryGuard key={accountId} revision={envRevision} routeDirty={canSave || (mode === "client" && envDirty)} accountId={accountId} disabled={measuring || !targetReady} />}
+          {supportsLaunchPolicy && <CodexProxyCountryGuard key={"country:" + accountId} revision={envRevision} routeDirty={canSave || (mode === "client" && envDirty)} accountId={accountId} disabled={measuring || !targetReady} />}
         </> : <div className="codex-proxy-account-details">
           <CodexProxyRuntimeStatusPanel accountId={accountId} revision={editor.savedBinding} desktopOnly={accountId === CODEX_API_SERVICE_PROXY_TARGET} />
           <div className="codex-proxy-account-check-actions">
