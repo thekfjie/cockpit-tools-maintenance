@@ -261,3 +261,31 @@ fn managed_country_probe_uses_the_same_https_route_and_bypass_as_launch() {
     assert_eq!(bypass.as_deref(), Some(no_proxy.1.as_str()));
     assert_eq!(source, "account");
 }
+
+// Protect the entry-point ordering as well as the probe's isolated behavior.
+#[test]
+fn country_gate_precedes_switch_mutations_and_cannot_be_disabled_by_autolaunch() {
+    let source = include_str!("../commands/codex_account_commands.rs");
+    let body = source.split_once("async fn switch_codex_account_internal(").unwrap().1
+        .split_once("\n}\n").unwrap().0;
+    let gate = body.find("codex_proxy_launch_guard::check_launch(").unwrap();
+    for later in [
+        "if launch_after_switch",
+        "disable_default_model_routing_for_non_oauth_switch().await",
+        "read_current_codex_launch_credential_snapshot()",
+        "codex_account::switch_account_managed_after_reauth_with_before_commit(",
+        "codex_account::switch_account_managed_with_before_commit_and_revalidation_options(",
+    ] {
+        assert!(gate < body.find(later).unwrap(), "country check must precede {later}");
+    }
+    let guarded = &body[gate..body.find("disable_default_model_routing_for_non_oauth_switch().await").unwrap()];
+    assert!(guarded.contains("return Err(error)"), "failed checks must stop the switch");
+
+    let source = include_str!("../commands/codex_instance.rs");
+    let body = source.split_once("async fn codex_start_instance_internal(").unwrap().1
+        .split_once("\n}\n").unwrap().0;
+    let gate = body.find("preflight_desktop_proxy(Some(&app)).await?").unwrap();
+    assert!(body.find("start_flow_lock.lock().await").unwrap() < gate);
+    assert!(gate < body.find("prepare_account_for_instance_launch_preflight(").unwrap());
+    assert!(gate < body.find("skip_failed_step ==").unwrap());
+}

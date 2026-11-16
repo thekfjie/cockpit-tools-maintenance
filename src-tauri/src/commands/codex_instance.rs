@@ -2793,13 +2793,13 @@ async fn codex_start_instance_internal(
         4,
         serde_json::json!({}),
     );
-    // Validate the effective route before credentials, profile writes, or stopping
-    // the previous client. Metadata/status lookup alone cannot detect a damaged engine.
-    launch_target.preflight_desktop_proxy(Some(&app)).await?;
-    ensure_codex_instance_start_not_cancelled(&instance_id)?;
     let start_flow_lock =
         CODEX_INSTANCE_START_FLOW_LOCK.get_or_init(|| tokio::sync::Mutex::new(()));
     let _start_flow_guard = start_flow_lock.lock().await;
+    ensure_codex_instance_start_not_cancelled(&instance_id)?;
+    // Check after waiting for the launch lock, but before credentials, profile
+    // writes or stopping the previous client. A skipped step cannot bypass this.
+    launch_target.preflight_desktop_proxy(Some(&app)).await?;
     ensure_codex_instance_start_not_cancelled(&instance_id)?;
     emit_codex_instance_launch_step(
         &app,

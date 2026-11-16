@@ -14,9 +14,10 @@ The account proxy dialog exposes an independent country-check setting, disabled
 by default. An account without a proxy binding can also choose an expected country.
 The setting is saved separately from the proxy binding.
 
-When launching from Cockpit, ordinary instance startup and switch-and-start both
-check the expected HTTP exit before proceeding, then recheck just before starting
-the GUI. Retry repeats the check; skipping a launch-progress step never skips it.
+When switching desktop accounts through Cockpit, check the expected HTTP exit
+before routing changes or credential preparation, even if automatic launch is
+disabled. Ordinary instance startup also checks before proceeding, then rechecks
+just before starting the GUI. Retry repeats the check; skipping a launch-progress step never skips it.
 The check is not applied to prepare-only CLI actions.
 
 A credential-free GET to ChatGPT Cloudflare trace reads its loc country code.

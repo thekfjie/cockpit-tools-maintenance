@@ -261,7 +261,11 @@ fn transition_with_env(
             .map(|(name, value)| (name.to_owned(), value))
             .collect()
     };
-    let projected_original = if manual {
+    // Keep only one authoritative set of proxy assignments. Different dotenv
+    // loaders disagree about duplicate keys; preserving old entries here could
+    // make the client use a different route from the launch preflight.
+    let replace_proxy = manual || !pairs.is_empty();
+    let projected_original = if replace_proxy {
         merge_defaults(original.as_deref(), Some(""))?
     } else {
         original.clone()
@@ -289,7 +293,7 @@ fn transition_with_env(
             account: account.into(),
             original,
             block,
-            replace_proxy: manual,
+            replace_proxy,
         });
         Some(projected)
     };
