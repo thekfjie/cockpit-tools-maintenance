@@ -1,0 +1,23 @@
+name: Proxy launch UI validation
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  ui:
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --prefer-offline --no-audit --no-fund
+      - run: node scripts/proxy-launch-ui.cjs
+      - uses: actions/upload-artifact@v6
+        if: always()
+        with:
+          name: proxy-launch-ui
+          path: proxy-ui-evidence
+          retention-days: 7
